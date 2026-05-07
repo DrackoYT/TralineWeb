@@ -43,6 +43,7 @@ body{
     background-color: #002966;
     margin: 0;
     padding-top: 80px;
+    overflow-x: hidden;
 }
 
 main{
@@ -572,6 +573,7 @@ a:hover {
         top: 100%;
         left: 0;
         width: 100%;
+        box-sizing: border-box;
         flex-direction: column;
         gap: 1rem;
         padding: 1.5rem 2rem;

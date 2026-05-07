@@ -1,6 +1,9 @@
 (function () {
   var canvas = document.createElement('canvas');
   var ctx = canvas.getContext('2d');
+  var particles = [];
+  var mouse = { x: null, y: null, radius: 120 };
+  var w, h;
 
   canvas.id = 'particles-canvas';
   canvas.style.position = 'fixed';
@@ -13,12 +16,11 @@
 
   document.body.prepend(canvas);
 
-  var particles = [];
-  var mouse = { x: null, y: null, radius: 120 };
-
   function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    w = document.documentElement.clientWidth;
+    h = document.documentElement.clientHeight;
+    canvas.width = w;
+    canvas.height = h;
   }
 
   window.addEventListener('resize', resize);
@@ -28,24 +30,22 @@
   });
 
   function Particle() {
-    this.reset = function () {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height;
-      this.size = Math.random() * (1.5 + canvas.width / 1200) + 0.5;
-      this.speedX = (Math.random() - 0.5) * 0.4;
-      this.speedY = -Math.random() * 0.25 - 0.05;
-      this.opacity = Math.random() * 0.5 + 0.15;
-      this.hue = Math.random() * 40 + 200;
-    };
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
+    this.size = Math.random() * (1 + w / 900) + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.3;
+    this.speedY = -Math.random() * 0.2 - 0.03;
+    this.opacity = Math.random() * 0.45 + 0.15;
+    this.hue = Math.random() * 40 + 200;
 
     this.update = function () {
       this.x += this.speedX;
       this.y += this.speedY;
 
-      if (this.x < -10) this.x = canvas.width + 10;
-      if (this.x > canvas.width + 10) this.x = -10;
-      if (this.y < -10) this.y = canvas.height + 10;
-      if (this.y > canvas.height + 10) this.y = -10;
+      if (this.x < -10) this.x = w + 10;
+      if (this.x > w + 10) this.x = -10;
+      if (this.y < -10) this.y = h + 10;
+      if (this.y > h + 10) this.y = -10;
 
       if (mouse.x !== null) {
         var dx = mouse.x - this.x;
@@ -65,21 +65,19 @@
       ctx.fillStyle = 'hsla(' + this.hue + ', 80%, 70%, ' + this.opacity + ')';
       ctx.fill();
     };
-
-    this.reset();
   }
 
-  var particleCount = Math.min(120, Math.floor((window.innerWidth * window.innerHeight) / 9000));
-
-  function init() {
-    for (var i = 0; i < particleCount; i++) {
+  function start() {
+    resize();
+    var count = Math.min(120, Math.floor((w * h) / 8000));
+    for (var i = 0; i < count; i++) {
       particles.push(new Particle());
     }
     animate();
   }
 
   function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, w, h);
 
     for (var i = 0; i < particles.length; i++) {
       particles[i].update();
@@ -103,6 +101,9 @@
     requestAnimationFrame(animate);
   }
 
-  resize();
-  init();
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    start();
+  } else {
+    document.addEventListener('DOMContentLoaded', start);
+  }
 })();
