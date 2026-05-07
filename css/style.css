@@ -115,23 +115,25 @@ h1{
 
 .PrimeraSeccion {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 30px 20px;
-    gap: 10px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+    gap: 40px;
     margin: 0 auto;
-    max-width: 700px;
+    max-width: 1000px;
     width: 100%;
 }
 
 .linea {
-    width: 60%;
-    height: 1px;
-    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
-    margin: 10px 0;
+    width: 2px;
+    height: auto;
+    align-self: stretch;
+    background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.3), transparent);
+    flex-shrink: 0;
 }
 .context {
-    max-width: 600px;
+    max-width: 450px;
     width: 100%;
 }
 
@@ -548,7 +550,18 @@ a:hover {
     h1 { font-size: 5rem; }
     .SegundaSeccion { width: 80%; gap: 1.5rem; }
     .ComoUnirse-titulo { font-size: 2.8rem; }
-    .PrimeraSeccion { padding: 20px 16px; }
+    .PrimeraSeccion {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 16px;
+        gap: 10px;
+    }
+    .linea {
+        width: 60%;
+        height: 1px;
+        background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+    }
+    .context { max-width: 600px; }
 }
 
 @media (max-width: 768px) {
@@ -642,43 +655,63 @@ a:hover {
 
 @media (max-width: 768px) {
     .arbol-rangos ul.nivel ul.nivel {
-        flex-direction: column;
-        align-items: center;
-        margin: 1rem 0 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 1.5rem 0 0;
+        gap: 0;
     }
 
     .arbol-rangos ul.nivel ul.nivel::before {
-        display: none;
+        display: block;
     }
 
     .arbol-rangos ul.nivel ul.nivel > li {
-        padding: 1.5rem 0 0;
+        padding: 2rem 0.5rem 0;
     }
 
     .arbol-rangos ul.nivel ul.nivel > li::before {
-        height: 1.5rem;
+        height: 2rem;
     }
 
     .arbol-rangos ul.nivel ul.nivel > li::after {
-        display: none;
+        display: block;
     }
 
     .nodo-rango {
-        min-width: 7rem;
-        padding: 1rem 1.4rem;
+        min-width: 0;
+        padding: 0.8rem 0.8rem;
     }
 
     .nombre-rango {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
 
     .titulo-rango {
-        font-size: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .jugador-rango {
+        font-size: 0.85rem;
     }
 
     .arbol-rangos {
-        padding: 2rem 1rem;
-        overflow-x: hidden;
+        padding: 2rem 0.5rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .arbol-rangos ul.nivel ul.nivel > li {
+        padding: 2rem 0.3rem 0;
+    }
+
+    .nodo-rango {
+        padding: 0.6rem 0.5rem;
+        min-width: 0;
+    }
+
+    .nombre-rango {
+        font-size: 1rem;
     }
 }
 

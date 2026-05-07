@@ -31,7 +31,7 @@
     this.reset = function () {
       this.x = Math.random() * canvas.width;
       this.y = Math.random() * canvas.height;
-      this.size = Math.random() * 2.5 + 0.5;
+      this.size = Math.random() * (1.5 + canvas.width / 1200) + 0.5;
       this.speedX = (Math.random() - 0.5) * 0.4;
       this.speedY = -Math.random() * 0.25 - 0.05;
       this.opacity = Math.random() * 0.5 + 0.15;
@@ -69,7 +69,7 @@
     this.reset();
   }
 
-  var particleCount = Math.min(80, Math.floor((window.innerWidth * window.innerHeight) / 12000));
+  var particleCount = Math.min(120, Math.floor((window.innerWidth * window.innerHeight) / 9000));
 
   function init() {
     for (var i = 0; i < particleCount; i++) {
