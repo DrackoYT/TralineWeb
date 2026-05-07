@@ -29,16 +29,7 @@ html{
     font-size: 62.5%;
 }
 .fondo1 {
-    background-image:
-            linear-gradient(rgba(0, 41, 102, 0.6), rgba(0, 41, 102, 0.6)),
-            linear-gradient(to bottom, rgba(0, 41, 102, 0) 70%, #002966 100%),
-            url("../imports/fondo2.jpg");
-
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-
+    background: linear-gradient(rgba(0, 30, 70, 0.7), rgba(0, 20, 50, 0.85)), url("../imports/fondo2.jpg") center/cover no-repeat fixed;
     min-height: 100vh;
     padding-bottom: 10rem;
 }
@@ -124,22 +115,23 @@ h1{
 
 .PrimeraSeccion {
     display: flex;
-    justify-content: center;
-    align-items: stretch;
-    padding: 40px 20px;
-
-    gap: 40px;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 20px;
+    gap: 10px;
     margin: 0 auto;
-    max-width: 1000px;
+    max-width: 700px;
     width: 100%;
 }
 
 .linea {
-    width: 2px;
-    background-color: white;
+    width: 60%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent);
+    margin: 10px 0;
 }
 .context {
-    max-width: 450px;
+    max-width: 600px;
     width: 100%;
 }
 
@@ -365,12 +357,13 @@ a:hover {
     backdrop-filter: blur(10px);
 }
 
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
 
 .nav-links {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-
     display: flex;
     gap: 2rem;
     list-style: none;
@@ -508,6 +501,184 @@ a:hover {
         width: 2px;
         height: 3rem;
         background: linear-gradient(to bottom, rgba(102, 163, 255, 0.15), rgba(102, 163, 255, 0.5), rgba(102, 163, 255, 0.15));
+    }
+}
+
+/* =====================
+   NAV TOGGLE (hamburguesa)
+   ===================== */
+
+.nav-toggle {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 4px;
+    z-index: 1100;
+}
+
+.nav-toggle span {
+    display: block;
+    width: 26px;
+    height: 2px;
+    background: #CCE0FF;
+    margin: 4px 0;
+    border-radius: 2px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.navbar.nav-open .nav-toggle span:nth-child(1) {
+    transform: rotate(45deg) translate(4px, 4px);
+}
+
+.navbar.nav-open .nav-toggle span:nth-child(2) {
+    opacity: 0;
+}
+
+.navbar.nav-open .nav-toggle span:nth-child(3) {
+    transform: rotate(-45deg) translate(4px, -4px);
+}
+
+/* =====================
+   RESPONSIVE
+   ===================== */
+
+@media (max-width: 900px) {
+    h1 { font-size: 5rem; }
+    .SegundaSeccion { width: 80%; gap: 1.5rem; }
+    .ComoUnirse-titulo { font-size: 2.8rem; }
+    .PrimeraSeccion { padding: 20px 16px; }
+}
+
+@media (max-width: 768px) {
+    .nav-toggle { display: flex; }
+
+    .nav-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem 2rem;
+        background: rgba(0, 25, 60, 0.97);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(102, 163, 255, 0.1);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px);
+        transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+        pointer-events: none;
+    }
+
+    .navbar.nav-open .nav-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+        pointer-events: auto;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+        width: 100%;
+    }
+
+    .nav-links a {
+        font-size: 1.6rem;
+        padding: 0.6rem 0;
+        display: block;
+        text-align: center;
+    }
+
+    .navbar .BotonDiscord {
+        margin-top: 0.5rem;
+        width: fit-content;
+        align-self: center;
+    }
+
+    h1 { font-size: 3.6rem; }
+    .Subtitulo { font-size: 1.2rem; top: -3rem; }
+    .MainLink { font-size: 0.9rem; top: -3rem; }
+
+    .SegundaSeccion {
+        flex-direction: column;
+        width: 100%;
+        margin: 2rem 0;
+        gap: 1rem;
+    }
+    .MiembrosCard { min-width: 0; width: 80%; }
+    .PrimeraSeccion { padding: 16px 12px; gap: 16px; }
+    .ParrafoContexto { font-size: 1.1rem; }
+
+    .ComoUnirse { padding: 3rem 1rem; }
+    .ComoUnirse-titulo { font-size: 2.2rem; }
+    .ComoUnirse-subtitulo { font-size: 1.1rem; }
+    .PasoCard { max-width: 280px; padding: 2rem 1.5rem; }
+    .PasoTitulo { font-size: 1.3rem; }
+    .PasoDescripcion { font-size: 1rem; }
+
+    .fondo1 { background-attachment: scroll; }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 2.8rem; }
+    .Subtitulo { font-size: 1rem; top: -2rem; }
+    .MainLink { font-size: 0.8rem; top: -2rem; }
+    .navbar { padding: 1rem 1.5rem; }
+    .nav-logo { font-size: 1.8rem; }
+    .nav-links a { font-size: 1.4rem; }
+    .MiembrosCard { width: 70%; font-size: 1.2rem; }
+    .PasoCard { max-width: 100%; margin: 0 1rem; }
+    .ParrafoContexto { font-size: 1rem; }
+    .BotonDiscord { font-size: 1.2rem; padding: 0.7rem 1.2rem; }
+}
+
+/* =====================
+   ÁRBOL DE RANGOS — RESPONSIVE
+   ===================== */
+
+@media (max-width: 768px) {
+    .arbol-rangos ul.nivel ul.nivel {
+        flex-direction: column;
+        align-items: center;
+        margin: 1rem 0 0;
+    }
+
+    .arbol-rangos ul.nivel ul.nivel::before {
+        display: none;
+    }
+
+    .arbol-rangos ul.nivel ul.nivel > li {
+        padding: 1.5rem 0 0;
+    }
+
+    .arbol-rangos ul.nivel ul.nivel > li::before {
+        height: 1.5rem;
+    }
+
+    .arbol-rangos ul.nivel ul.nivel > li::after {
+        display: none;
+    }
+
+    .nodo-rango {
+        min-width: 7rem;
+        padding: 1rem 1.4rem;
+    }
+
+    .nombre-rango {
+        font-size: 1.2rem;
+    }
+
+    .titulo-rango {
+        font-size: 1rem;
+    }
+
+    .arbol-rangos {
+        padding: 2rem 1rem;
+        overflow-x: hidden;
     }
 }
 

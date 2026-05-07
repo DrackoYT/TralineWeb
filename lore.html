@@ -12,13 +12,20 @@
 <nav class="navbar">
     <div class="nav-logo">Traline</div>
 
-    <ul class="nav-links">
-        <li><a href="/TralineWeb">Inicio</a></li>
-        <li><a href="/TralineWeb/cargos.html">Rangos</a></li>
-        <li><a href="/TralineWeb/lore.html">Lore</a></li>
-    </ul>
+    <div class="nav-menu">
+        <ul class="nav-links">
+            <li><a href="https://traline.vercel.app/">Inicio</a></li>
+            <li><a href="https://traline.vercel.app/cargos.html">Rangos</a></li>
+            <li><a href="https://traline.vercel.app/lore.html">Lore</a></li>
+        </ul>
+        <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
+    </div>
 
-    <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
+    <button class="nav-toggle" aria-label="Menú">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
 </nav>
 
 <main>
@@ -31,5 +38,12 @@
 </main>
 
 
+    <script src="js/particles.js"></script>
+    <script src="js/animations.js"></script>
+    <script>
+        document.querySelector('.nav-toggle')?.addEventListener('click', function() {
+            document.querySelector('.navbar').classList.toggle('nav-open');
+        });
+    </script>
 </body>
 </html>
