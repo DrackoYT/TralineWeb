@@ -1,0 +1,552 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+@font-face {
+    font-family: 'Minecraft';
+    src: url('/fonts/Minecraftia-Regular.ttf') format('woff2');
+}
+
+/* Chrome, Edge */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(102, 163, 255, 0.5);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 163, 255, 0.8);
+}
+
+html{
+    font-family: Minecraft;
+    color: white;
+    font-size: 62.5%;
+}
+.fondo1 {
+    background-image:
+            linear-gradient(rgba(0, 41, 102, 0.6), rgba(0, 41, 102, 0.6)),
+            linear-gradient(to bottom, rgba(0, 41, 102, 0) 70%, #002966 100%),
+            url("../imports/fondo2.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    min-height: 100vh;
+    padding-bottom: 10rem;
+}
+
+a{
+    text-decoration: none;
+
+}
+
+body{
+    background-color: #002966;
+    margin: 0;
+    padding-top: 80px;
+}
+
+main{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+}
+
+h1{
+
+    align-self: center;
+    justify-self: center;
+    font-size: 7rem;
+    margin-bottom: 0;
+}
+
+.MainLink{
+    position: relative;
+    top: -5rem;
+    margin-bottom: 0rem;
+
+    align-self: center;
+    justify-self: center;
+    font-size: 1rem;
+    color: #CCE0FF;
+}
+.Link2{
+    color: #CCE0FF;
+}
+
+.Subtitulo{
+    position: relative;
+    top: -5rem;
+    color: #66A3FF;
+
+    align-self: center;
+    justify-self: center;
+    font-size: 1.5rem;
+}
+
+.no-select {
+    user-select: none;
+}
+
+.context{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+}
+
+.context p{
+    margin-bottom: 1rem;
+}
+
+.ParrafoContexto {
+    font-size: 1.3rem;
+    line-height: 1.8;
+
+}
+
+.Link3{
+    color: #CCE0FF;
+    text-decoration: underline;
+}
+
+.PrimeraSeccion {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    padding: 40px 20px;
+
+    gap: 40px;
+    margin: 0 auto;
+    max-width: 1000px;
+    width: 100%;
+}
+
+.linea {
+    width: 2px;
+    background-color: white;
+}
+.context {
+    max-width: 450px;
+    width: 100%;
+}
+
+.SegundaSeccion{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 3rem;
+    width: 50%;
+    justify-self: center;
+}
+
+.MiembrosCard{
+    background-color: rgba(102, 163, 255, 0.25);
+    backdrop-filter: blur(10px);
+    width: auto;
+    min-width: 12rem;
+    font-size: 1.4rem;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    padding: 1rem;
+
+    border-radius: 2.5rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+}
+
+.MiembrosCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.BotonDiscord {
+    font-family: Minecraft;
+    font-size: 1.4rem;
+    color: #002966;
+    background-color: gold;
+    padding: 0.8rem 1.6rem;
+    border: none;
+    border-radius: 0.8rem;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.BotonDiscord:hover {
+    transform: scale(1.05);
+    background-color: #ffd700cc;
+    opacity: 1;
+}
+
+
+a:hover {
+    opacity: 0.8;
+}
+
+/* =====================
+   ÁRBOL DE RANGOS
+   ===================== */
+
+.arbol-rangos {
+    display: flex;
+    justify-content: center;
+    padding: 4rem 2rem;
+    overflow-x: auto;
+}
+
+/* Lista raíz: columna centrada */
+.arbol-rangos > ul.nivel {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.arbol-rangos > ul.nivel > li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Niveles anidados: fila horizontal */
+.arbol-rangos ul.nivel ul.nivel {
+    list-style: none;
+    padding: 0;
+    margin: 3rem 0 0;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    position: relative;
+}
+
+/* Línea vertical desde la tarjeta padre hasta la barra horizontal */
+.arbol-rangos ul.nivel ul.nivel::before {
+    content: '';
+    position: absolute;
+    top: -3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 3rem;
+    background: rgba(102, 163, 255, 0.45);
+}
+
+/* Cada nodo hijo */
+.arbol-rangos ul.nivel ul.nivel > li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 1.5rem 0;
+    position: relative;
+}
+
+/* Caída vertical desde la barra hasta la tarjeta */
+.arbol-rangos ul.nivel ul.nivel > li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 3rem;
+    background: rgba(102, 163, 255, 0.45);
+}
+
+/* Segmentos de la barra horizontal */
+.arbol-rangos ul.nivel ul.nivel > li::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 2px;
+    background: rgba(102, 163, 255, 0.45);
+}
+
+.arbol-rangos ul.nivel ul.nivel > li:first-child:not(:only-child)::after {
+    left: 50%;
+    right: 0;
+}
+
+.arbol-rangos ul.nivel ul.nivel > li:last-child:not(:only-child)::after {
+    left: 0;
+    right: 50%;
+}
+
+.arbol-rangos ul.nivel ul.nivel > li:not(:first-child):not(:last-child)::after {
+    left: 0;
+    right: 0;
+}
+
+.arbol-rangos ul.nivel ul.nivel > li:only-child::after {
+    display: none;
+}
+
+/* =====================
+   TARJETA DE NODO
+   ===================== */
+
+.nodo-rango {
+    background-color: rgba(102, 163, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 163, 255, 0.25);
+    border-radius: 1.2rem;
+    padding: 1.2rem 1.6rem;
+    text-align: center;
+    min-width: 9rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.nodo-rango:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    border-color: rgba(102, 163, 255, 0.55);
+}
+
+/* Líder: resaltado especial */
+.nodo-lider {
+    background-color: rgba(102, 163, 255, 0.28);
+    border-color: rgba(102, 163, 255, 0.55);
+    box-shadow: 0 0 20px rgba(102, 163, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.nombre-rango {
+    font-size: 1.4rem;
+    color: #CCE0FF;
+    margin: 0 0 0.3rem 0;
+}
+
+.titulo-rango {
+    font-size: 1.1rem;
+    color: #66A3FF;
+    margin: 0 0 0.5rem 0;
+}
+
+.jugador-rango {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.55);
+    display: block;
+}
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 3rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+    z-index: 1000;
+    background-color: rgba(0, 41, 102, 0.7);
+    backdrop-filter: blur(10px);
+}
+
+
+.nav-links {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    color: #CCE0FF;
+    font-size: 1.4rem;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 4px;
+    transition: color 0.2s ease;
+}
+
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0%;
+    height: 2px;
+    background-color: #66A3FF;
+    transition: width 0.25s ease;
+}
+
+.nav-links a:hover {
+    color: #ffffff;
+    opacity: 1;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.proximamente{
+    font-size: 2rem;
+}
+
+.construccion{
+    font-size: 5rem;
+}
+
+/* =====================
+   CÓMO UNIRSE
+   ===================== */
+
+.ComoUnirse {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5rem 2rem;
+    gap: 1.5rem;
+}
+
+.ComoUnirse-titulo {
+    font-size: 3.5rem;
+    margin: 0;
+    color: #CCE0FF;
+}
+
+.ComoUnirse-subtitulo {
+    font-size: 1.3rem;
+    color: #66A3FF;
+    margin: 0 0 2rem 0;
+}
+
+.PasosContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+    max-width: 1000px;
+    width: 100%;
+    margin-bottom: 3rem;
+}
+
+.PasoCard {
+    background-color: rgba(102, 163, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(102, 163, 255, 0.2);
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    max-width: 240px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.PasoCard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    border-color: rgba(102, 163, 255, 0.5);
+}
+
+.PasoNumero {
+    font-size: 3rem;
+    color: rgba(102, 163, 255, 0.35);
+    display: block;
+    margin-bottom: 0.8rem;
+    line-height: 1;
+}
+
+.PasoTitulo {
+    font-size: 1.5rem;
+    color: #CCE0FF;
+    margin: 0 0 0.8rem 0;
+}
+
+.PasoDescripcion {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.7;
+    margin: 0;
+}
+
+/* Línea conectora entre pasos */
+.PasoConector {
+    width: 4rem;
+    height: 2px;
+    background: linear-gradient(to right, rgba(102, 163, 255, 0.15), rgba(102, 163, 255, 0.5), rgba(102, 163, 255, 0.15));
+    flex-shrink: 0;
+}
+
+/* En mobile, la línea se vuelve vertical */
+@media (max-width: 768px) {
+    .PasosContainer {
+        flex-direction: column;
+    }
+
+    .PasoConector {
+        width: 2px;
+        height: 3rem;
+        background: linear-gradient(to bottom, rgba(102, 163, 255, 0.15), rgba(102, 163, 255, 0.5), rgba(102, 163, 255, 0.15));
+    }
+}
+
+/* =====================
+   SCROLL REVEAL
+   ===================== */
+
+.reveal {
+    opacity: 0;
+    transition: opacity 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal.visible {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) !important;
+}
+
+.reveal.fade-in-up {
+    transform: translateY(40px);
+}
+
+.reveal.fade-in-down {
+    transform: translateY(-40px);
+}
+
+.reveal.fade-in-left {
+    transform: translateX(-40px);
+}
+
+.reveal.fade-in-right {
+    transform: translateX(40px);
+}
+
+.reveal.scale-in {
+    transform: scale(0.85);
+}
+
+.reveal.fade-in {
+    transform: none;
+}
+

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Traline</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-logo">Traline</div>
+
+        <ul class="nav-links">
+            <li><a href="/TralineWeb">Inicio</a></li>
+            <li><a href="/TralineWeb/cargos.php">Rangos</a></li>
+            <li><a href="/TralineWeb/lore.php">Lore</a></li>
+        </ul>
+
+        <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
+    </nav>
+
+
+
+    <div class="fondo1">
+        <main>
+            <div class="tittle-section reveal fade-in-up">
+                <h1 class="Titulo no-select">Traline</h1>
+                <a class="MainLink no-select" href="https://discord.gg/NGz9CfcWVs">MineShoku Tensei | Discord</a>
+            </div>
+            <h5 class="Subtitulo no-select reveal fade-in-up" data-delay="200">El primer y único gremio en español</h5>
+        </main>
+
+        <div class="PrimeraSeccion">
+            <div class="context reveal fade-in-left">
+                <h3 class="no-select">¿Quién somos?</h3>
+
+                <p class="no-select ParrafoContexto">
+                    Traline es un gremio de magos y aventureros dentro del servidor de
+                    <a class="Link2" href="https://discord.gg/NGz9CfcWVs"><strong>MineShoku Tensei</strong></a>,
+                    un entorno RPG inspirado en el anime "Mushoku Tensei".
+                </p>
+
+                <p class="no-select ParrafoContexto">
+                    Nuestro objetivo es impulsar el roleplay dentro del servidor,
+                    actuando como un pilar clave para la comunidad hispanohablante.
+                </p>
+
+                <p class="no-select ParrafoContexto">
+                    No solo buscamos crecer como gremio, sino también consolidarnos
+                    como una de las guilds más destacadas, apoyando tanto a nuevos
+                    jugadores como a veteranos en su progreso y experiencia.
+                </p>
+
+                <p>Para saber más sobre el lore</p>
+                <a class="Link3" href="/TralineWeb/lore.php">Clic aquí</a>
+
+            </div>
+            <div class="linea"></div>
+            <div class="context reveal fade-in-right">
+                <h3 class="no-select">Nuestros Rangos</h3>
+
+                <p class="no-select ParrafoContexto">
+                    Al frente se encuentra el <strong>Khar'Nath</strong>, líder del gremio y voz de Traline, el representante y guía.
+                </p>
+                <p class="no-select ParrafoContexto">
+                    Junto a él está el <strong>Valar'Mar</strong>, director de Arcanis, la academia de Traline. Es el encargado de formar a los Thal'vyr.
+                </p>
+                <p class="no-select ParrafoContexto">
+                    Cuando la guerra llama, es el <strong>Draek'Vorn</strong> quien responde. Señor de las filas y comandante de las fuerzas del gremio.
+                </p>
+                <p class="no-select ParrafoContexto">
+                    En el ámbito de la prosperidad se encuentra el <strong>Velkar'Ith</strong>, encargado de la economía y gestión de los recursos de Traline.
+                </p>
+
+                <p>Para saber más sobre los rangos</p>
+                <a class="Link3" href="/TralineWeb/cargos.php">Clic aquí</a>
+
+
+            </div>
+        </div>
+
+        <div class="SegundaSeccion">
+
+            <div class="MiembrosCard reveal scale-in" data-delay="0">
+                <p><strong>Miembros</strong></p>
+                <p>+40</p>
+            </div>
+
+            <div class="MiembrosCard reveal scale-in" data-delay="150">
+                <p><strong>Fundado</strong></p>
+                <p>29 jul. 2024</p>
+            </div>
+
+            <div class="MiembrosCard reveal scale-in" data-delay="300">
+                <p><strong>Servidor</strong></p>
+                <p>MineShoku Tensei</p>
+            </div>
+
+        </div>
+
+        <section class="ComoUnirse">
+            <h2 class="no-select ComoUnirse-titulo reveal fade-in-up">¿Cómo unirte?</h2>
+            <p class="no-select ComoUnirse-subtitulo reveal fade-in-up" data-delay="150">Tres pasos para formar parte de Traline</p>
+
+            <div class="PasosContainer">
+
+                <div class="PasoCard reveal fade-in-up" data-delay="0">
+                    <span class="PasoNumero">01</span>
+                    <h3 class="PasoTitulo">Entra al Discord</h3>
+                    <p class="PasoDescripcion">
+                        Únete al servidor de MineShoku Tensei y busca el canal
+                        <strong>#tickets</strong> dentro de la categoría de Traline.
+                    </p>
+                </div>
+
+                <div class="PasoConector reveal scale-in" data-delay="200"></div>
+
+                <div class="PasoCard reveal fade-in-up" data-delay="200">
+                    <span class="PasoNumero">02</span>
+                    <h3 class="PasoTitulo">Lee las normas</h3>
+                    <p class="PasoDescripcion">
+                        Revisa las reglas del gremio. Traline valora el respeto,
+                        el roleplay serio y el compromiso con la comunidad.
+                    </p>
+                </div>
+
+                <div class="PasoConector reveal scale-in" data-delay="400"></div>
+
+                <div class="PasoCard reveal fade-in-up" data-delay="400">
+                    <span class="PasoNumero">03</span>
+                    <h3 class="PasoTitulo">Postula</h3>
+                    <p class="PasoDescripcion">
+                        Abre un ticket y rellena el formulario de postulación. Un miembro del consejo
+                        revisará tu solicitud y te dará una respuesta pronto.
+                    </p>
+                </div>
+
+            </div>
+
+            <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">
+                Ir al Discord →
+            </a>
+        </section>
+
+    </div>
+
+    <script src="js/particles.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+</html>
