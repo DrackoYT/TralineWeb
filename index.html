@@ -31,7 +31,7 @@
 
 
 
-    <div class="fondo1">
+    <div class="fondo1 page-wrapper">
         <main>
             <div class="tittle-section reveal fade-in-up">
                 <h1 class="Titulo no-select">Traline</h1>
@@ -153,6 +153,139 @@
         </section>
 
     </div>
+
+    <canvas id="model-viewer"></canvas>
+    <canvas id="model-viewer-2"></canvas>
+
+    <script type="importmap">
+        {
+          "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+          }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        const W = 300;
+        const H = 400;
+
+        function createViewer(canvasId, modelPath, mode) {
+            const canvas = document.getElementById(canvasId);
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+            renderer.setSize(W, H);
+            renderer.setPixelRatio(devicePixelRatio);
+            renderer.setClearColor(0x000000, 0);
+
+            const scene = new THREE.Scene();
+
+            const camera = new THREE.PerspectiveCamera(45, W / H, 0.1, 100);
+            camera.position.set(0, 0, 4);
+            camera.lookAt(0, 0, 0);
+
+            scene.add(new THREE.AmbientLight(0xffffff, 1.5));
+            const dir = new THREE.DirectionalLight(0xffffff, 2);
+            dir.position.set(5, 10, 5);
+            scene.add(dir);
+
+            let mixer;
+
+            const loader = new GLTFLoader();
+            loader.load(
+                modelPath,
+                (gltf) => {
+                    const model = gltf.scene;
+
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+                    model.position.sub(center);
+                    model.rotation.y = Math.PI;
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    camera.position.set(0, 0, maxDim * 2);
+                    camera.lookAt(0, 0, 0);
+
+                    scene.add(model);
+
+                    mixer = new THREE.AnimationMixer(model);
+
+                    const idleClip = THREE.AnimationClip.findByName(gltf.animations, 'idle');
+
+                    if (mode === 'idle') {
+                        if (!idleClip) {
+                            console.warn('No idle animation found for', modelPath);
+                            return;
+                        }
+                        const idleAction = mixer.clipAction(idleClip);
+                        idleAction.setLoop(THREE.LoopRepeat);
+                        idleAction.play();
+                        return;
+                    }
+
+                    const interactClip = THREE.AnimationClip.findByName(gltf.animations, 'interact');
+
+                    if (!interactClip || !idleClip) {
+                        console.warn('Animaciones disponibles para', modelPath);
+                        gltf.animations.forEach(a => console.log(' -', a.name));
+                        return;
+                    }
+
+                    const interactAction = mixer.clipAction(interactClip);
+                    const idleAction     = mixer.clipAction(idleClip);
+
+                    interactAction.setLoop(THREE.LoopOnce, 1);
+                    idleAction.setLoop(THREE.LoopOnce, 1);
+                    interactAction.clampWhenFinished = true;
+                    idleAction.clampWhenFinished = true;
+
+                    let idleCount = 0;
+
+                    function playInteract() {
+                        idleCount = 0;
+                        idleAction.stop();
+                        interactAction.reset().play();
+                    }
+
+                    function playIdle() {
+                        interactAction.stop();
+                        idleAction.reset().play();
+                    }
+
+                    mixer.addEventListener('finished', (e) => {
+                        if (e.action === interactAction) {
+                            playIdle();
+                        } else if (e.action === idleAction) {
+                            idleCount++;
+                            if (idleCount < 2) {
+                                playIdle();
+                            } else {
+                                playInteract();
+                            }
+                        }
+                    });
+
+                    playInteract();
+                },
+                undefined,
+                (err) => console.error('Error al cargar', modelPath, err)
+            );
+
+            const clock = new THREE.Clock();
+            function animate() {
+                requestAnimationFrame(animate);
+                mixer?.update(clock.getDelta());
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        createViewer('model-viewer', 'imports/models/NPC1.glb', 'cycle');
+        createViewer('model-viewer-2', 'imports/models/NPC2.glb', 'idle');
+    </script>
 
     <script src="js/particles.js"></script>
     <script src="js/animations.js"></script>

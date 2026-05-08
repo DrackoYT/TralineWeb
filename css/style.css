@@ -43,6 +43,9 @@ body{
     background-color: #002966;
     margin: 0;
     padding-top: 80px;
+}
+
+.page-wrapper {
     overflow-x: hidden;
 }
 
@@ -355,7 +358,7 @@ a:hover {
     left: 0;
     width: 100%;
     box-sizing: border-box;
-    z-index: 1000;
+    z-index: 10000;
     background-color: rgba(0, 41, 102, 0.7);
     backdrop-filter: blur(10px);
 }
@@ -756,3 +759,21 @@ a:hover {
     transform: none;
 }
 
+#model-viewer,
+#model-viewer-2 {
+    position: absolute;
+    width: 300px;
+    height: 400px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+#model-viewer {
+    left: 20px;
+    bottom: 100px;
+}
+
+#model-viewer-2 {
+    right: 20px;
+    top: 900px;
+}
