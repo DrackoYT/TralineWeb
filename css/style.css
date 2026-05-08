@@ -43,9 +43,6 @@ body{
     background-color: #002966;
     margin: 0;
     padding-top: 80px;
-}
-
-.page-wrapper {
     overflow-x: hidden;
 }
 
@@ -127,6 +124,7 @@ h1{
     margin: 0 auto;
     max-width: 1000px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .linea {
@@ -148,6 +146,7 @@ h1{
     margin: 3rem;
     width: 50%;
     justify-self: center;
+    box-sizing: border-box;
 }
 
 .MiembrosCard{
@@ -631,6 +630,9 @@ a:hover {
     .PrimeraSeccion { padding: 16px 12px; gap: 16px; }
     .ParrafoContexto { font-size: 1.1rem; }
 
+    #model-viewer,
+    #model-viewer-2 { display: none; }
+
     .ComoUnirse { padding: 3rem 1rem; }
     .ComoUnirse-titulo { font-size: 2.2rem; }
     .ComoUnirse-subtitulo { font-size: 1.1rem; }
@@ -650,7 +652,7 @@ a:hover {
     .nav-links a { font-size: 1.4rem; }
     .MiembrosCard { width: 70%; font-size: 1.2rem; }
     .PasoCard { max-width: 100%; margin: 0 1rem; }
-    .ParrafoContexto { font-size: 1rem; }
+    .ParrafoContexto { font-size: 1rem; text-align: center }
     .BotonDiscord { font-size: 1.2rem; padding: 0.7rem 1.2rem; }
 }
 
