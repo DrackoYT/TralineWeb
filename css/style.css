@@ -779,3 +779,15 @@ a:hover {
     right: 20px;
     top: 900px;
 }
+
+.cargosMain{
+    background: linear-gradient(rgba(0, 30, 70, 0.7), rgba(0, 20, 50, 0.85)), url("../imports/fondo1.jpg") center/cover no-repeat fixed;
+    min-height: 100vh;
+    padding-bottom: 10rem;
+}
+
+.loreMain{
+    background: linear-gradient(rgba(0, 30, 70, 0.7), rgba(0, 20, 50, 0.85)), url("../imports/fondo3.png") center/cover no-repeat fixed;
+    min-height: 100vh;
+    padding-bottom: 10rem;
+}
