@@ -33,32 +33,139 @@
             <li>
                 <div class="nodo-rango nodo-lider">
                     <p class="nombre-rango">Khar'Nath</p>
-                    <p class="titulo-rango">Líder</p>
+                    <p class="titulo-rango">Líder Político</p>
                     <span class="jugador-rango">Kael Tharion</span>
                 </div>
 
                 <ul class="nivel">
+
+                    <li>
+                        <details class="departamento">
+                            <summary>
+                                <div class="nodo-rango">
+                                    <p class="nombre-rango">Draek'Vorn</p>
+                                    <p class="titulo-rango">Líder Militar</p>
+                                    <span class="jugador-rango">Mon Benegrey</span>
+                                </div>
+                            </summary>
+                            <ul class="nivel">
+                                <li>
+                                    <div class="nodo-rango">
+                                        <p class="nombre-rango">Draek'val</p>
+                                        <p class="titulo-rango">Comandante</p>
+                                        <span class="jugador-rango">...</span>
+                                    </div>
+                                    <ul class="nivel">
+                                        <li>
+                                            <div class="nodo-rango">
+                                                <p class="nombre-rango">Kelix</p>
+                                                <p class="titulo-rango">Capitán</p>
+                                                <span class="jugador-rango">Denkuto</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </details>
+                    </li>
+
+                    <li>
+                        <details class="departamento">
+                            <summary>
+                                <div class="nodo-rango">
+                                    <p class="nombre-rango">Orzan'khel</p>
+                                    <p class="titulo-rango">Custodio de Justicia</p>
+                                    <span class="jugador-rango">Emil Vaelor</span>
+                                </div>
+                            </summary>
+                            <ul class="nivel">
+                                <li>
+                                    <div class="nodo-rango">
+                                        <p class="nombre-rango">Khel'Oran</p>
+                                        <p class="titulo-rango">Consejero</p>
+                                        <span class="jugador-rango">Alessandro</span>
+                                    </div>
+                                    <ul class="nivel">
+                                        <li>
+                                            <div class="nodo-rango">
+                                                <p class="nombre-rango">Veyr'Ath</p>
+                                                <p class="titulo-rango">Archivista</p>
+                                                <span class="jugador-rango">Kirlian</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </details>
+                    </li>
+
                     <li>
                         <div class="nodo-rango">
-                            <p class="nombre-rango">Valar'Mar</p>
-                            <p class="titulo-rango">Director</p>
-                            <span class="jugador-rango">Magnus Thalassar</span>
+                            <p class="nombre-rango">Zyrel'thorn</p>
+                            <p class="titulo-rango">Información</p>
+                            <span class="jugador-rango">Aren Flaren</span>
                         </div>
                     </li>
+
                     <li>
-                        <div class="nodo-rango">
-                            <p class="nombre-rango">Draek'Vorn</p>
-                            <p class="titulo-rango">Militar</p>
-                            <span class="jugador-rango">Mon Benegrey</span>
-                        </div>
+                        <details class="departamento">
+                            <summary>
+                                <div class="nodo-rango">
+                                    <p class="nombre-rango">Valar'Mar</p>
+                                    <p class="titulo-rango">Director</p>
+                                    <span class="jugador-rango">Magnus Thalassar</span>
+                                </div>
+                            </summary>
+                            <ul class="nivel">
+                                <li>
+                                    <div class="nodo-rango">
+                                        <p class="nombre-rango">Valar'Ves</p>
+                                        <p class="titulo-rango">Jefe de Estudios</p>
+                                        <span class="jugador-rango">...</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="nodo-rango">
+                                        <p class="nombre-rango">Valar'khal</p>
+                                        <p class="titulo-rango">Examinador Físico</p>
+                                        <span class="jugador-rango">...</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="nodo-rango">
+                                        <p class="nombre-rango">Valar'eth</p>
+                                        <p class="titulo-rango">Examinador Moral</p>
+                                        <span class="jugador-rango">Pinpon</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </details>
                     </li>
+
                     <li>
                         <div class="nodo-rango">
                             <p class="nombre-rango">Velkar'Ith</p>
-                            <p class="titulo-rango">Comerciante</p>
+                            <p class="titulo-rango">Economía</p>
                             <span class="jugador-rango">Faber</span>
                         </div>
                     </li>
+
+                    <li>
+                        <div class="nodo-rango">
+                            <p class="nombre-rango">Eldor'veth</p>
+                            <p class="titulo-rango">Recursos</p>
+                            <span class="jugador-rango">Polaraz Gray</span>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="nodo-rango">
+                            <p class="nombre-rango">Theryn'mar</p>
+                            <p class="titulo-rango">Trabajo</p>
+                            <span class="jugador-rango">Uino Ping</span>
+                        </div>
+                    </li>
+
                 </ul>
 
             </li>
@@ -77,6 +184,23 @@
         document.querySelector('.nav-toggle')?.addEventListener('click', function() {
             document.querySelector('.navbar').classList.toggle('nav-open');
         });
+
+        // Abrir acordeones en desktop, cerrar en móvil
+        (function() {
+            var deps = document.querySelectorAll('.departamento');
+            function toggleAccordion() {
+                var isDesktop = window.innerWidth > 768;
+                deps.forEach(function(d) {
+                    if (isDesktop) {
+                        d.setAttribute('open', '');
+                    } else {
+                        d.removeAttribute('open');
+                    }
+                });
+            }
+            toggleAccordion();
+            window.addEventListener('resize', toggleAccordion);
+        })();
     </script>
 </body>
 </html>
