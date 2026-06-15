@@ -3,31 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Traline</title>
+    <meta name="description" content="Conoce la jerarquía de Traline: Khar'Nath, los siete líderes de facción y todos los rangos del gremio de MineShoku Tensei.">
+    <meta property="og:title" content="Traline — Rangos">
+    <meta property="og:description" content="Jerarquía completa del gremio Traline en MineShoku Tensei.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://traline.vercel.app/cargos">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Traline — Rangos">
+    <meta name="twitter:description" content="Jerarquía completa del gremio Traline en MineShoku Tensei.">
+    <title>Traline — Rangos</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
 
 <nav class="navbar">
     <div class="nav-logo">Traline</div>
 
     <div class="nav-menu">
         <ul class="nav-links">
-            <li><a href="https://traline.vercel.app/">Inicio</a></li>
-            <li><a href="https://traline.vercel.app/cargos.html">Rangos</a></li>
-            <li><a href="https://traline.vercel.app/lore.html">Lore</a></li>
+            <li><a href="/">Inicio</a></li>
+            <li><a href="/cargos.html" aria-current="page">Rangos</a></li>
+            <li><a href="/lore.html">Lore</a></li>
         </ul>
-        <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
-    </div>
+            <span id="admin-status" class="admin-badge"></span>
+            <button id="admin-btn" class="btn btn-ghost">Iniciar sesión</button>
+            <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
+        </div>
 
-    <button class="nav-toggle" aria-label="Menú">
+    <button class="nav-toggle" aria-label="Menú" aria-expanded="false">
         <span></span>
         <span></span>
         <span></span>
     </button>
 </nav>
 
-<main class="cargosMain">
+<main class="cargosMain" id="main-content">
     <div class="arbol-rangos">
         <ul class="nivel">
             <li>
@@ -53,7 +68,7 @@
                                     <div class="nodo-rango">
                                         <p class="nombre-rango">Draek'val</p>
                                         <p class="titulo-rango">Comandante</p>
-                                        <span class="jugador-rango">...</span>
+                                        <span class="jugador-rango">Vacante</span>
                                     </div>
                                     <ul class="nivel">
                                         <li>
@@ -121,14 +136,14 @@
                                     <div class="nodo-rango">
                                         <p class="nombre-rango">Valar'Ves</p>
                                         <p class="titulo-rango">Jefe de Estudios</p>
-                                        <span class="jugador-rango">...</span>
+                                        <span class="jugador-rango">Vacante</span>
                                     </div>
                                 </li>
                                 <li>
                                     <div class="nodo-rango">
                                         <p class="nombre-rango">Valar'khal</p>
                                         <p class="titulo-rango">Examinador Físico</p>
-                                        <span class="jugador-rango">...</span>
+                                        <span class="jugador-rango">Vacante</span>
                                     </div>
                                 </li>
                                 <li>
@@ -172,34 +187,72 @@
         </ul>
     </div>
 
-    <div class="proximamente">
-        <p>MÁS PROXIMAMENTE</p>
-    </div>
+    <p class="proximamente-texto">Más rangos y departamentos próximamente...</p>
 </main>
 
 
+    <footer class="footer">
+        <div class="footer-contenido">
+            <div class="footer-logo">Traline</div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/cargos.html">Rangos</a></li>
+                <li><a href="/lore.html">Lore</a></li>
+            </ul>
+            <p class="footer-copyright">© 2026 Traline. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <button class="back-to-top" aria-label="Volver arriba">↑</button>
+
+    <script src="js/lore-auth.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/animations.js"></script>
     <script>
-        document.querySelector('.nav-toggle')?.addEventListener('click', function() {
-            document.querySelector('.navbar').classList.toggle('nav-open');
+        const nav = document.querySelector('.navbar');
+        const toggle = document.querySelector('.nav-toggle');
+
+        toggle?.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('nav-open');
+            toggle.setAttribute('aria-expanded', isOpen);
         });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && nav.classList.contains('nav-open')) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.focus();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        const backToTop = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('visible', window.scrollY > 500);
+        }, { passive: true });
+        backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
         // Abrir acordeones en desktop, cerrar en móvil
         (function() {
             var deps = document.querySelectorAll('.departamento');
-            function toggleAccordion() {
-                var isDesktop = window.innerWidth > 768;
+            var mql = window.matchMedia('(min-width: 769px)');
+            function toggleAccordion(e) {
                 deps.forEach(function(d) {
-                    if (isDesktop) {
+                    if (e.matches) {
                         d.setAttribute('open', '');
                     } else {
                         d.removeAttribute('open');
                     }
                 });
             }
-            toggleAccordion();
-            window.addEventListener('resize', toggleAccordion);
+            toggleAccordion(mql);
+            mql.addEventListener('change', toggleAccordion);
         })();
     </script>
 </body>

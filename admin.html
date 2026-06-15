@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="description" content="Foro de Traline — lore, normativa, preguntas y discusión del gremio en MineShoku Tensei.">
-    <meta property="og:title" content="Traline — Foro">
-    <meta property="og:description" content="Foro del gremio Traline en MineShoku Tensei.">
+    <meta name="description" content="Panel de administración de Traline.">
+    <meta property="og:title" content="Traline — Admin">
+    <meta property="og:description" content="Panel de administración del foro del gremio Traline.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://traline.vercel.app/lore">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Traline — Foro">
-    <meta name="twitter:description" content="Foro del gremio Traline en MineShoku Tensei.">
-    <title>Traline — Foro</title>
+    <meta property="og:url" content="https://traline.vercel.app/admin">
+    <title>Traline — Admin</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,7 +24,7 @@
             <ul class="nav-links">
                 <li><a href="/">Inicio</a></li>
                 <li><a href="/cargos.html">Rangos</a></li>
-                <li><a href="/lore.html" aria-current="page">Foro</a></li>
+                <li><a href="/lore.html">Foro</a></li>
             </ul>
             <span id="admin-status" class="admin-badge"></span>
             <button id="admin-btn" class="btn btn-ghost">Iniciar sesión</button>
@@ -39,15 +36,14 @@
     </nav>
 
     <main id="main-content" class="lore-page">
-
         <div class="lore-header">
-            <h1 class="lore-title">Foro</h1>
-            <p class="lore-subtitle">Lore, normativa, preguntas y discusión del gremio</p>
+            <a href="/lore.html" class="btn btn-ghost" style="margin-bottom:1rem;border-color:transparent">&larr; Volver al foro</a>
+            <h1 class="lore-title">Panel de Administración</h1>
+            <p class="lore-subtitle">Gestiona usuarios, entradas y notificaciones del foro</p>
         </div>
 
-        <div id="category-tabs" class="category-tabs"></div>
-        <div id="forum-actions" class="forum-actions"></div>
-        <div id="lore-forum" class="lore-list"></div>
+        <div id="admin-tabs" class="admin-tabs"></div>
+        <div id="admin-content" class="admin-content"></div>
     </main>
 
     <footer class="footer">
@@ -105,26 +101,19 @@
         </div>
     </div>
 
-    <!-- Editor -->
-    <div id="editor-modal" class="modal-overlay">
-        <div class="modal-box modal-wide">
-            <h3 id="editor-modal-title">Nueva entrada</h3>
+    <!-- Notification -->
+    <div id="notif-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Enviar notificación</h3>
             <div class="modal-body">
-                <input type="text" id="editor-title" placeholder="Título">
-                <select id="editor-category">
-                    <option value="Q&A">Q&A</option>
-                    <option value="Lore">Lore</option>
-                    <option value="Normativa">Normativa</option>
-                    <option value="General">General</option>
-                </select>
-                <div class="editor-wrapper">
-                    <div id="editor-toolbar" class="editor-toolbar"></div>
-                    <div id="editor-content" class="editor-content" contenteditable="true"></div>
-                </div>
+                <p style="color:#8a9aaf;font-size:1.2rem">Se enviará a <strong id="notif-count">0</strong> usuario(s)</p>
+                <input type="text" id="notif-subject" placeholder="Asunto">
+                <textarea id="notif-message" placeholder="Mensaje" rows="6" class="notif-textarea"></textarea>
+                <p id="notif-result" class="text-error"></p>
             </div>
             <div class="modal-footer">
-                <button id="editor-cancel" class="btn btn-ghost">Cancelar</button>
-                <button id="editor-save" class="btn btn-primary">Publicar</button>
+                <button id="notif-cancel" class="btn btn-ghost">Cancelar</button>
+                <button id="notif-send" class="btn btn-primary">Copiar y enviar</button>
             </div>
         </div>
     </div>
@@ -134,7 +123,7 @@
     <script src="js/particles.js"></script>
     <script src="js/animations.js"></script>
     <script src="js/lore-auth.js"></script>
-    <script src="js/lore-editor.js"></script>
+    <script src="js/lore-admin.js"></script>
     <script>
         const nav = document.querySelector('.navbar');
         const toggle = document.querySelector('.nav-toggle');

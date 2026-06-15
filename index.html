@@ -3,26 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>Traline</title>
+    <meta name="description" content="Traline — el primer gremio en español de MineShoku Tensei. Gremio de magos y aventureros enfocado en roleplay hispano.">
+    <meta property="og:title" content="Traline — Gremio en MineShoku Tensei">
+    <meta property="og:description" content="El primer gremio en español de MineShoku Tensei. Únete a nuestra comunidad de magos y aventureros.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://traline.vercel.app/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Traline — Gremio en MineShoku Tensei">
+    <meta name="twitter:description" content="El primer gremio en español de MineShoku Tensei. Únete a nuestra comunidad de magos y aventureros.">
+    <title>Traline — Inicio</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
     <nav class="navbar">
         <div class="nav-logo">Traline</div>
 
         <div class="nav-menu">
             <ul class="nav-links">
-                <li><a href="https://traline.vercel.app/">Inicio</a></li>
-                <li><a href="https://traline.vercel.app/cargos.html">Rangos</a></li>
-                <li><a href="https://traline.vercel.app/lore.html">Lore</a></li>
+                <li><a href="/" aria-current="page">Inicio</a></li>
+                <li><a href="/cargos.html">Rangos</a></li>
+                <li><a href="/lore.html">Lore</a></li>
             </ul>
+            <span id="admin-status" class="admin-badge"></span>
+            <button id="admin-btn" class="btn btn-ghost">Iniciar sesión</button>
             <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
         </div>
 
-        <button class="nav-toggle" aria-label="Menú">
+        <button class="nav-toggle" aria-label="Menú" aria-expanded="false">
             <span></span>
             <span></span>
             <span></span>
@@ -32,12 +45,12 @@
 
 
     <div class="fondo1 page-wrapper">
-        <main>
+        <main id="main-content">
             <div class="tittle-section reveal fade-in-up">
                 <h1 class="Titulo no-select">Traline</h1>
                 <a class="MainLink no-select" href="https://discord.gg/NGz9CfcWVs">MineShoku Tensei | Discord</a>
             </div>
-            <h5 class="Subtitulo no-select reveal fade-in-up" data-delay="200">El primer y único gremio en español</h5>
+            <h5 class="Subtitulo no-select reveal fade-in-up" data-delay="200">El primer gremio en español</h5>
         </main>
 
         <div class="PrimeraSeccion">
@@ -62,7 +75,7 @@
                 </p>
 
                 <p>Para saber más sobre el lore</p>
-                <a class="Link3" href="https://traline.vercel.app/lore.html">Clic aquí</a>
+                <a class="Link3" href="/lore.html">Clic aquí</a>
 
             </div>
             <div class="linea"></div>
@@ -70,22 +83,19 @@
                 <h3 class="no-select">Nuestros Rangos</h3>
 
                 <p class="no-select ParrafoContexto">
-                    Al frente se encuentra el <strong>Khar'Nath</strong>, líder del gremio y voz de Traline, el representante y guía.
-                </p>
-                <p class="no-select ParrafoContexto">
-                    Junto a él está el <strong>Valar'Mar</strong>, director de Arcanis, la academia de Traline. Es el encargado de formar a los Thal'vyr.
-                </p>
-                <p class="no-select ParrafoContexto">
-                    Cuando la guerra llama, es el <strong>Draek'Vorn</strong> quien responde. Señor de las filas y comandante de las fuerzas del gremio.
-                </p>
-                <p class="no-select ParrafoContexto">
-                    En el ámbito de la prosperidad se encuentra el <strong>Velkar'Ith</strong>, encargado de la economía y gestión de los recursos de Traline.
+                    Al frente de Traline se encuentra el <strong>Khar'Nath</strong>, líder del gremio, representante de sus miembros y encargado de mantener el equilibrio entre sus distintas facciones.
                 </p>
 
-                <p>Para saber más sobre los rangos</p>
-                <a class="Link3" href="https://traline.vercel.app/cargos.html">Clic aquí</a>
+                <p class="no-select ParrafoContexto">
+                    Junto a él actúa el <strong>Thal'Kharan Veil</strong>, el consejo de Traline, compuesto por los líderes de las siete facciones que sostienen el gremio y velan por su crecimiento, seguridad y prosperidad.
+                </p>
 
+                <p class="no-select ParrafoContexto">
+                    Cada facción cumple una función esencial dentro de Traline, trabajando en conjunto para formar, proteger y guiar a todos los Thal'Vyr.
+                </p>
 
+                <p>Para saber más sobre los rangos y facciones</p>
+                <a class="Link3" href="/cargos.html">Clic aquí</a>
             </div>
         </div>
 
@@ -118,8 +128,8 @@
                     <span class="PasoNumero">01</span>
                     <h3 class="PasoTitulo">Entra al Discord</h3>
                     <p class="PasoDescripcion">
-                        Únete al servidor de MineShoku Tensei y busca el canal
-                        <strong>#tickets</strong> dentro de la categoría de Traline.
+                        Únete a nuestro servidor y abre un ticket en el canal
+                        <strong>#tickets</strong> para comenzar tu proceso de ingreso.
                     </p>
                 </div>
 
@@ -287,12 +297,52 @@
         createViewer('model-viewer-2', 'imports/models/NPC2.glb', 'idle');
     </script>
 
+    <footer class="footer">
+        <div class="footer-contenido">
+            <div class="footer-logo">Traline</div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/cargos.html">Rangos</a></li>
+                <li><a href="/lore.html">Lore</a></li>
+            </ul>
+            <p class="footer-copyright">© 2026 Traline. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <button class="back-to-top" aria-label="Volver arriba">↑</button>
+
+    <script src="js/lore-auth.js"></script>
     <script src="js/particles.js"></script>
     <script src="js/animations.js"></script>
     <script>
-        document.querySelector('.nav-toggle')?.addEventListener('click', function() {
-            document.querySelector('.navbar').classList.toggle('nav-open');
+        const nav = document.querySelector('.navbar');
+        const toggle = document.querySelector('.nav-toggle');
+
+        toggle?.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('nav-open');
+            toggle.setAttribute('aria-expanded', isOpen);
         });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && nav.classList.contains('nav-open')) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.focus();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        const backToTop = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('visible', window.scrollY > 500);
+        }, { passive: true });
+        backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     </script>
 </body>
 </html>
