@@ -54,7 +54,11 @@
     animate();
   }
 
+  var animId = null;
+  var running = true;
+
   function animate() {
+    if (!running) return;
     ctx.clearRect(0, 0, w, h);
 
     for (var i = 0; i < particles.length; i++) {
@@ -99,8 +103,15 @@
       }
     }
 
-    requestAnimationFrame(animate);
+    animId = requestAnimationFrame(animate);
   }
+
+  document.addEventListener('visibilitychange', function () {
+    running = !document.hidden;
+    if (running && !animId) {
+      animId = requestAnimationFrame(animate);
+    }
+  });
 
   if (document.readyState === 'complete' || document.readyState === 'interactive') {
     start();
