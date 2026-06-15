@@ -4,6 +4,7 @@ var USERS_KEY = 'traline_users';
 var ADMIN_PASSWORD = 'traline2024';
 var GOOGLE_CLIENT_ID = '1061389217388-d9utb39d4hh7heq2crlmff8sl5nojl4p.apps.googleusercontent.com';
 var DISCORD_CLIENT_ID = '1515996446464278590';
+var ALL_PERMS = ['manage_users', 'manage_entries', 'manage_notifications', 'manage_admins'];
 var currentUser = null;
 
 function getEntries() {
@@ -40,6 +41,9 @@ function registerUser(username, password, email, notifications) {
     bio: '',
     googleId: '',
     icon: username.charAt(0).toUpperCase(),
+    picture: '',
+    role: 'user',
+    permissions: [],
     createdAt: new Date().toISOString()
   });
   saveUsers(users);
@@ -76,6 +80,28 @@ function isCurrentUserAdmin() {
   return false;
 }
 
+function hasPermission(perm) {
+  try {
+    var stored = sessionStorage.getItem('traline_admin');
+    if (stored) {
+      var data = JSON.parse(stored);
+      return data.isAdmin === true && data.permissions && data.permissions.indexOf(perm) !== -1;
+    }
+  } catch (e) {}
+  return false;
+}
+
+function getCurrentUserPerms() {
+  try {
+    var stored = sessionStorage.getItem('traline_admin');
+    if (stored) {
+      var data = JSON.parse(stored);
+      return data.permissions || [];
+    }
+  } catch (e) {}
+  return [];
+}
+
 function checkSession() {
   try {
     var stored = sessionStorage.getItem('traline_admin');
@@ -87,8 +113,8 @@ function checkSession() {
   return false;
 }
 
-function saveSession(user, isAdmin) {
-  sessionStorage.setItem('traline_admin', JSON.stringify({ user: user, expiry: Date.now() + 3600000, isAdmin: isAdmin }));
+function saveSession(user, isAdmin, permissions) {
+  sessionStorage.setItem('traline_admin', JSON.stringify({ user: user, expiry: Date.now() + 3600000, isAdmin: isAdmin, permissions: permissions || [] }));
 }
 
 function clearSession() { sessionStorage.removeItem('traline_admin'); currentUser = null; }
@@ -98,14 +124,19 @@ function login(password, username) {
   var user = authenticateUser(username, password);
   if (user) {
     currentUser = username;
-    saveSession(currentUser, isAdminPwd);
+    var perms = (user.role === 'admin' && user.permissions) ? user.permissions : [];
+    saveSession(currentUser, user.role === 'admin', perms);
     return true;
   }
   if (!isAdminPwd) return false;
   currentUser = username || 'Admin';
-  saveSession(currentUser, true);
   var users = getUsers();
-  if (!users.some(function (u) { return u.username === currentUser; })) {
+  var existing = users.find(function (u) { return u.username === currentUser; });
+  if (existing) {
+    existing.role = 'admin';
+    existing.permissions = ALL_PERMS.slice();
+    saveUsers(users);
+  } else {
     users.push({
       username: currentUser,
       passwordHash: '',
@@ -115,10 +146,13 @@ function login(password, username) {
       googleId: '',
       icon: currentUser.charAt(0).toUpperCase(),
       picture: '',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      role: 'admin',
+      permissions: ALL_PERMS.slice()
     });
     saveUsers(users);
   }
+  saveSession(currentUser, true, ALL_PERMS);
   return true;
 }
 
@@ -182,6 +216,8 @@ function loginWithGoogle(googleId, email, displayName, picture) {
         googleId: googleId,
         icon: username.charAt(0).toUpperCase(),
         picture: picture || '',
+        role: 'user',
+        permissions: [],
         createdAt: new Date().toISOString()
       });
       saveUsers(users);
@@ -189,7 +225,9 @@ function loginWithGoogle(googleId, email, displayName, picture) {
     }
   }
   currentUser = user.username;
-  saveSession(currentUser, false);
+  var isAdmin = user.role === 'admin';
+  var perms = isAdmin && user.permissions ? user.permissions : [];
+  saveSession(currentUser, isAdmin, perms);
   renderAdminUI();
   if (typeof renderForum === 'function') renderForum();
   closeModal('login-modal');
@@ -271,6 +309,8 @@ function loginWithDiscord(user) {
         discordId: user.id,
         icon: username.charAt(0).toUpperCase(),
         picture: avatarUrl,
+        role: 'user',
+        permissions: [],
         createdAt: new Date().toISOString()
       });
       saveUsers(users);
@@ -278,7 +318,9 @@ function loginWithDiscord(user) {
     }
   }
   currentUser = existing.username;
-  saveSession(currentUser, false);
+  var isAdmin = existing.role === 'admin';
+  var perms = isAdmin && existing.permissions ? existing.permissions : [];
+  saveSession(currentUser, isAdmin, perms);
   renderAdminUI();
   if (typeof renderForum === 'function') renderForum();
   closeModal('login-modal');
@@ -368,20 +410,22 @@ function renderAdminUI() {
       adminBtn.textContent = 'Panel admin';
       adminBtn.addEventListener('click', function (e) { e.stopPropagation(); window.location.href = '/admin.html'; });
       menu.appendChild(adminBtn);
-      var notifBtn = document.createElement('button');
-      notifBtn.className = 'dropdown-item';
-      notifBtn.textContent = 'Enviar notificación';
-      notifBtn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var count = getNotifiedUsers().length;
-        if (!count) { alert('No hay usuarios registrados con correo y notificaciones activadas.'); return; }
-        document.getElementById('notif-count').textContent = count;
-        document.getElementById('notif-subject').value = '';
-        document.getElementById('notif-message').value = '';
-        document.getElementById('notif-result').style.display = 'none';
-        document.getElementById('notif-modal').classList.add('open');
-      });
-      menu.appendChild(notifBtn);
+      if (hasPermission('manage_notifications')) {
+        var notifBtn = document.createElement('button');
+        notifBtn.className = 'dropdown-item';
+        notifBtn.textContent = 'Enviar notificación';
+        notifBtn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var count = getNotifiedUsers().length;
+          if (!count) { alert('No hay usuarios registrados con correo y notificaciones activadas.'); return; }
+          document.getElementById('notif-count').textContent = count;
+          document.getElementById('notif-subject').value = '';
+          document.getElementById('notif-message').value = '';
+          document.getElementById('notif-result').style.display = 'none';
+          document.getElementById('notif-modal').classList.add('open');
+        });
+        menu.appendChild(notifBtn);
+      }
     }
     var lo = document.createElement('button');
     lo.className = 'dropdown-logout-btn';
@@ -413,10 +457,26 @@ document.addEventListener('DOMContentLoaded', function initAuth() {
       googleId: '',
       icon: 'K',
       picture: '',
+      role: 'admin',
+      permissions: ALL_PERMS.slice(),
       createdAt: new Date().toISOString()
     }];
     localStorage.setItem(USERS_KEY, JSON.stringify(seed));
   }
+
+  // Migrate existing users: ensure role, permissions, and Kael Tharion is admin
+  var allUsers = getUsers();
+  var changed = false;
+  allUsers.forEach(function (u) {
+    if (!u.role) { u.role = 'user'; changed = true; }
+    if (!u.permissions) { u.permissions = []; changed = true; }
+    if (u.username === 'Kael Tharion' && u.role !== 'admin') {
+      u.role = 'admin';
+      u.permissions = ALL_PERMS.slice();
+      changed = true;
+    }
+  });
+  if (changed) saveUsers(allUsers);
 
   // Check for Discord OAuth result
   try {

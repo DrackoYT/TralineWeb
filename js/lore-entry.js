@@ -36,7 +36,7 @@ function renderEntry(entry) {
       '</div>' +
       '<h2 style="font-size:2rem;color:#e8edf2;margin:0 0 2rem;font-weight:600">' + escapeHtml(entry.title) + '</h2>' +
       '<div class="entry-body">' + sanitizeHTML(entry.content) + '</div>' +
-      (currentUser && (isCurrentUserAdmin() || entry.author === currentUser) ? '<div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #1a2430;display:flex;gap:1rem">' +
+      (currentUser && (hasPermission('manage_entries') || entry.author === currentUser) ? '<div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #1a2430;display:flex;gap:1rem">' +
         '<button class="btn btn-sm btn-edit" id="entry-edit-btn">Editar</button>' +
         '<button class="btn btn-sm btn-delete" id="entry-delete-btn">Eliminar</button>' +
       '</div>' : '') +
@@ -53,7 +53,7 @@ function renderEntry(entry) {
     var all = getEntries();
     var e = all.find(function (x) { return x.id === entry.id; });
     if (!e) return;
-    if (!isCurrentUserAdmin() && e.author !== currentUser) return;
+    if (!hasPermission('manage_entries') && e.author !== currentUser) return;
     saveEntries(all.filter(function (x) { return x.id !== entry.id; }));
     window.location.href = '/lore.html';
   });

@@ -22,7 +22,7 @@ function updateEntry(id, title, category, content) {
   var entries = getEntries();
   var idx = entries.findIndex(function (e) { return e.id === id; });
   if (idx === -1) return;
-  if (!isCurrentUserAdmin() && entries[idx].author !== currentUser) return;
+  if (!hasPermission('manage_entries') && entries[idx].author !== currentUser) return;
   entries[idx].title = title;
   entries[idx].category = category;
   entries[idx].content = content;
@@ -36,7 +36,7 @@ function deleteEntry(id) {
   var entries = getEntries();
   var entry = entries.find(function (e) { return e.id === id; });
   if (!entry) return;
-  if (!isCurrentUserAdmin() && entry.author !== currentUser) return;
+  if (!hasPermission('manage_entries') && entry.author !== currentUser) return;
   saveEntries(entries.filter(function (e) { return e.id !== id; }));
   renderForum();
 }
@@ -70,13 +70,13 @@ function renderForum() {
   var actionsContainer = document.getElementById('forum-actions');
   if (actionsContainer) {
     actionsContainer.innerHTML = '';
-    if (currentUser && (isCurrentUserAdmin() || selectedCategory === 'General')) {
+    if (currentUser && (hasPermission('manage_entries') || selectedCategory === 'General')) {
       var addBtn = document.createElement('button');
       addBtn.className = 'category-add-btn';
       addBtn.textContent = '+ Nueva entrada';
       addBtn.addEventListener('click', function (e) {
         e.stopPropagation();
-        document.getElementById('editor-category').value = isCurrentUserAdmin() ? selectedCategory : 'General';
+        document.getElementById('editor-category').value = hasPermission('manage_entries') ? selectedCategory : 'General';
         openEditor(null);
       });
       actionsContainer.appendChild(addBtn);
@@ -108,7 +108,7 @@ function renderForum() {
           (entry.updatedAt !== entry.createdAt ? '<span class="forum-card-edited">editado</span>' : '') +
         '</div>' +
       '</div>';
-    if (currentUser && (isCurrentUserAdmin() || entry.author === currentUser)) {
+    if (currentUser && (hasPermission('manage_entries') || entry.author === currentUser)) {
       var actions = document.createElement('div');
       actions.className = 'forum-card-actions';
       actions.innerHTML =
@@ -159,7 +159,7 @@ function showEntry(id) {
       '<h2 style="font-size:2rem;color:#e8edf2;margin:0 0 2rem;font-weight:600">' + escapeHtml(entry.title) + '</h2>' +
       '<div class="entry-body">' + sanitizeHTML(entry.content) + '</div>' +
       '<div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #1a2430;display:flex;gap:1rem">' +
-        (currentUser && (isCurrentUserAdmin() || entry.author === currentUser) ? '<button class="btn btn-sm btn-edit" data-id="' + entry.id + '">Editar</button>' : '') +
+        (currentUser && (hasPermission('manage_entries') || entry.author === currentUser) ? '<button class="btn btn-sm btn-edit" data-id="' + entry.id + '">Editar</button>' : '') +
         '<button class="btn btn-sm btn-ghost close-btn">Cerrar</button>' +
       '</div>' +
     '</div>';
@@ -167,7 +167,7 @@ function showEntry(id) {
   requestAnimationFrame(function () { overlay.classList.add('open'); });
   overlay.querySelector('.close-btn')?.addEventListener('click', function () { overlay.remove(); });
   overlay.querySelector('.author-link')?.addEventListener('click', function () { openProfileView(this.dataset.author); });
-  if (currentUser && (isCurrentUserAdmin() || entry.author === currentUser)) {
+  if (currentUser && (hasPermission('manage_entries') || entry.author === currentUser)) {
     overlay.querySelector('.btn-edit')?.addEventListener('click', function () {
       overlay.remove(); openEditor(parseInt(this.dataset.id));
     });
@@ -186,7 +186,7 @@ function openEditor(id) {
   var categorySelect = document.getElementById('editor-category');
   var contentInput = document.getElementById('editor-content');
   var modalTitle = document.getElementById('editor-modal-title');
-  var isAdmin = isCurrentUserAdmin();
+  var isAdmin = hasPermission('manage_entries');
 
   if (id) {
     var entries = getEntries();
@@ -215,38 +215,127 @@ function openEditor(id) {
 function initEditorToolbar() {
   var toolbar = document.getElementById('editor-toolbar');
   if (!toolbar) return;
-  var btns = [
-    { cmd: 'bold', icon: 'B', title: 'Negrita' },
-    { cmd: 'italic', icon: 'I', title: 'Cursiva' },
-    { cmd: 'underline', icon: 'U', title: 'Subrayado' },
-    { type: 'sep' },
-    { cmd: 'formatBlock', value: 'h3', icon: 'H', title: 'Encabezado' },
-    { cmd: 'formatBlock', value: 'p', icon: 'P', title: 'Párrafo' },
-    { type: 'sep' },
-    { cmd: 'insertUnorderedList', icon: '\u2022', title: 'Lista' },
-    { cmd: 'insertOrderedList', icon: '1.', title: 'Lista numerada' },
-    { type: 'sep' },
-    { cmd: 'insertHorizontalRule', icon: '\u2014', title: 'L\u00ednea' },
-    { cmd: 'formatBlock', value: 'blockquote', icon: '"', title: 'Cita' }
-  ];
-  btns.forEach(function (b) {
-    if (b.type === 'sep') {
-      var s = document.createElement('span');
-      s.className = 'toolbar-sep';
-      toolbar.appendChild(s);
-      return;
-    }
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = b.icon;
-    btn.title = b.title;
-    btn.className = 'toolbar-btn';
-    btn.addEventListener('click', function () {
-      document.execCommand(b.cmd, false, b.value || null);
+
+  function sep() {
+    var s = document.createElement('span');
+    s.className = 'toolbar-sep';
+    toolbar.appendChild(s);
+  }
+
+  function btn(cmd, html, title, value) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'toolbar-btn';
+    b.title = title;
+    b.innerHTML = html;
+    b.addEventListener('click', function () {
+      if (cmd === 'createLink') {
+        var url = prompt('URL del enlace:');
+        if (url) document.execCommand(cmd, false, url);
+      } else if (cmd === 'insertImage') {
+        var imgUrl = prompt('URL de la imagen:');
+        if (imgUrl) document.execCommand(cmd, false, imgUrl);
+      } else {
+        document.execCommand(cmd, false, value || null);
+      }
       document.getElementById('editor-content').focus();
     });
-    toolbar.appendChild(btn);
-  });
+    toolbar.appendChild(b);
+  }
+
+  function colorPicker(html, title, cmd, defaultColor) {
+    var label = document.createElement('label');
+    label.className = 'toolbar-btn color-btn';
+    label.title = title;
+    label.innerHTML = html + '<span class="color-indicator" style="background:' + defaultColor + '"></span>';
+    var input = document.createElement('input');
+    input.type = 'color';
+    input.value = defaultColor;
+    input.className = 'color-picker';
+    input.addEventListener('input', function () {
+      document.execCommand(cmd, false, this.value);
+      label.querySelector('.color-indicator').style.background = this.value;
+      document.getElementById('editor-content').focus();
+    });
+    label.appendChild(input);
+    toolbar.appendChild(label);
+  }
+
+  function fontSizeDropdown() {
+    var select = document.createElement('select');
+    select.className = 'toolbar-select';
+    select.title = 'Tama\u00f1o de fuente';
+    var sizes = [
+      { label: 'Tama\u00f1o...', val: '' },
+      { label: 'Muy peque\u00f1o', val: '1' },
+      { label: 'Peque\u00f1o', val: '2' },
+      { label: 'Normal', val: '3' },
+      { label: 'Grande', val: '5' },
+      { label: 'Muy grande', val: '7' }
+    ];
+    sizes.forEach(function (s) {
+      var opt = document.createElement('option');
+      opt.value = s.val;
+      opt.textContent = s.label;
+      select.appendChild(opt);
+    });
+    select.addEventListener('change', function () {
+      if (!this.value) return;
+      document.execCommand('fontSize', false, this.value);
+      this.selectedIndex = 0;
+      document.getElementById('editor-content').focus();
+    });
+    toolbar.appendChild(select);
+  }
+
+  // --- Build toolbar ---
+
+  // Text style
+  btn('bold', '<b>B</b>', 'Negrita');
+  btn('italic', '<i>I</i>', 'Cursiva');
+  btn('underline', '<u>U</u>', 'Subrayado');
+  btn('strikeThrough', '<s>S</s>', 'Tachado');
+  sep();
+
+  // Headings
+  btn('formatBlock', 'H1', 'Encabezado 1', 'h1');
+  btn('formatBlock', 'H2', 'Encabezado 2', 'h2');
+  btn('formatBlock', 'H3', 'Encabezado 3', 'h3');
+  btn('formatBlock', 'P', 'P\u00e1rrafo', 'p');
+  fontSizeDropdown();
+  sep();
+
+  // Color
+  colorPicker('A', 'Color de texto', 'foreColor', '#d8dde2');
+  colorPicker('<span style="background:#ff0;color:#000;padding:1px 3px;border-radius:2px">A</span>', 'Resaltado', 'backColor', '#ffff00');
+  sep();
+
+  // Alignment
+  btn('justifyLeft', '\u25C2', 'Alinear izquierda');
+  btn('justifyCenter', '\u25C6', 'Centrar');
+  btn('justifyRight', '\u25B8', 'Alinear derecha');
+  btn('justifyFull', '\u2B0C', 'Justificar');
+  sep();
+
+  // Lists
+  btn('insertUnorderedList', '\u2022', 'Lista');
+  btn('insertOrderedList', '1.', 'Lista numerada');
+  sep();
+
+  // Insert
+  btn('createLink', '\u2B98', 'Insertar enlace');
+  btn('insertImage', '\u229E', 'Insertar imagen');
+  btn('insertHorizontalRule', '\u2014', 'L\u00ednea horizontal');
+  sep();
+
+  // Blocks
+  btn('formatBlock', '\u275E', 'Cita', 'blockquote');
+  btn('formatBlock', '{ }', 'C\u00f3digo', 'pre');
+  sep();
+
+  // Undo / Redo
+  btn('undo', '\u21A9', 'Deshacer');
+  btn('redo', '\u21AA', 'Rehacer');
 }
 
 document.addEventListener('DOMContentLoaded', function () {
