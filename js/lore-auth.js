@@ -1,4 +1,4 @@
-/* Shared auth module — defines globals used by lore-editor.js and lore-profile.js */
+/* Shared auth module -- Supabase edition */
 var STORAGE_KEY = 'traline_forum_entries';
 var USERS_KEY = 'traline_users';
 var ADMIN_PASSWORD = 'traline2024';
@@ -7,20 +7,28 @@ var DISCORD_CLIENT_ID = '1515996446464278590';
 var ALL_PERMS = ['manage_users', 'manage_entries', 'manage_notifications', 'manage_admins'];
 var currentUser = null;
 
-function getEntries() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { return []; }
+async function getEntries() {
+  try {
+    var sb = getSupabase();
+    var { data, error } = await sb.from('entries').select('*').order('id', { ascending: false });
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.error('getEntries error:', e);
+    return [];
+  }
 }
 
-function saveEntries(entries) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
-
-function getUsers() {
-  try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; } catch (e) { return []; }
-}
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+async function getUsers() {
+  try {
+    var sb = getSupabase();
+    var { data, error } = await sb.from('users').select('*');
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.error('getUsers error:', e);
+    return [];
+  }
 }
 
 function hashPassword(pwd) {
@@ -29,46 +37,54 @@ function hashPassword(pwd) {
   return h;
 }
 
-function registerUser(username, password, email, notifications) {
-  var users = getUsers();
-  if (users.some(function (u) { return u.username === username; })) return 'username';
-  if (email && users.some(function (u) { return u.email && u.email.toLowerCase() === email.toLowerCase(); })) return 'email';
-  users.push({
+async function registerUser(username, password, email, notifications) {
+  var sb = getSupabase();
+  var { data: existing } = await sb.from('users').select('username').eq('username', username).maybeSingle();
+  if (existing) return 'username';
+  if (email) {
+    var { data: emailMatch } = await sb.from('users').select('email').eq('email', email).maybeSingle();
+    if (emailMatch) return 'email';
+  }
+  var { error } = await sb.from('users').insert({
     username: username,
-    passwordHash: hashPassword(password),
+    password_hash: hashPassword(password),
     email: email || '',
     notifications: notifications === true,
     bio: '',
-    googleId: '',
+    google_id: '',
+    discord_id: '',
     icon: username.charAt(0).toUpperCase(),
     picture: '',
     role: 'user',
-    permissions: [],
-    createdAt: new Date().toISOString()
+    permissions: []
   });
-  saveUsers(users);
+  if (error) { console.error('registerUser error:', error); return false; }
   return true;
 }
 
-function authenticateUser(username, password) {
-  var users = getUsers();
-  return users.find(function (u) { return u.username === username && u.passwordHash === hashPassword(password); });
+async function authenticateUser(username, password) {
+  var sb = getSupabase();
+  var hash = hashPassword(password);
+  var { data } = await sb.from('users').select('*').eq('username', username).eq('password_hash', hash).maybeSingle();
+  return data || null;
 }
 
-function getUserProfile(username) {
-  return getUsers().find(function (u) { return u.username === username; });
+async function getUserProfile(username) {
+  var sb = getSupabase();
+  var { data } = await sb.from('users').select('*').eq('username', username).maybeSingle();
+  return data || null;
 }
 
-function updateUserProfile(username, updates) {
-  var users = getUsers();
-  var user = users.find(function (u) { return u.username === username; });
-  if (!user) return false;
-  if (updates.email !== undefined) user.email = updates.email;
-  if (updates.notifications !== undefined) user.notifications = updates.notifications;
-  if (updates.bio !== undefined) user.bio = updates.bio;
-  if (updates.icon !== undefined) user.icon = updates.icon;
-  if (updates.picture !== undefined) user.picture = updates.picture;
-  saveUsers(users);
+async function updateUserProfile(username, updates) {
+  var sb = getSupabase();
+  var payload = {};
+  if (updates.email !== undefined) payload.email = updates.email;
+  if (updates.notifications !== undefined) payload.notifications = updates.notifications;
+  if (updates.bio !== undefined) payload.bio = updates.bio;
+  if (updates.icon !== undefined) payload.icon = updates.icon;
+  if (updates.picture !== undefined) payload.picture = updates.picture;
+  var { error } = await sb.from('users').update(payload).eq('username', username);
+  if (error) { console.error('updateUserProfile error:', error); return false; }
   return true;
 }
 
@@ -119,9 +135,10 @@ function saveSession(user, isAdmin, permissions) {
 
 function clearSession() { sessionStorage.removeItem('traline_admin'); currentUser = null; }
 
-function login(password, username) {
+async function login(password, username) {
+  var sb = getSupabase();
   var isAdminPwd = hashPassword(password) === hashPassword(ADMIN_PASSWORD);
-  var user = authenticateUser(username, password);
+  var user = await authenticateUser(username, password);
   if (user) {
     currentUser = username;
     var perms = (user.role === 'admin' && user.permissions) ? user.permissions : [];
@@ -130,27 +147,24 @@ function login(password, username) {
   }
   if (!isAdminPwd) return false;
   currentUser = username || 'Admin';
-  var users = getUsers();
-  var existing = users.find(function (u) { return u.username === currentUser; });
+  var { data: existing } = await sb.from('users').select('*').eq('username', currentUser).maybeSingle();
   if (existing) {
-    existing.role = 'admin';
-    existing.permissions = ALL_PERMS.slice();
-    saveUsers(users);
+    await sb.from('users').update({ role: 'admin', permissions: ALL_PERMS }).eq('username', currentUser);
   } else {
-    users.push({
+    await sb.from('users').insert({
       username: currentUser,
-      passwordHash: '',
+      password_hash: '',
       email: '',
       notifications: true,
       bio: '',
-      googleId: '',
+      google_id: '',
+      discord_id: '',
       icon: currentUser.charAt(0).toUpperCase(),
       picture: '',
-      createdAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
       role: 'admin',
-      permissions: ALL_PERMS.slice()
+      permissions: ALL_PERMS
     });
-    saveUsers(users);
   }
   saveSession(currentUser, true, ALL_PERMS);
   return true;
@@ -158,12 +172,13 @@ function login(password, username) {
 
 function logout() { clearSession(); renderAdminUI(); closeModal('login-modal'); }
 
-function getNotifiedUsers() {
-  return getUsers().filter(function (u) { return u.email && u.notifications; });
+async function getNotifiedUsers() {
+  var users = await getUsers();
+  return users.filter(function (u) { return u.email && u.notifications; });
 }
 
-function sendNotification(subject, message) {
-  var users = getNotifiedUsers();
+async function sendNotification(subject, message) {
+  var users = await getNotifiedUsers();
   if (!users.length) return alert('No hay usuarios con notificaciones activadas.');
   var recipients = users.map(function (u) { return u.email; });
 
@@ -191,37 +206,40 @@ function openProfileView(username) {
   window.location.href = '/perfil.html?user=' + encodeURIComponent(username);
 }
 
-function loginWithGoogle(googleId, email, displayName, picture) {
+async function loginWithGoogle(googleId, email, displayName, picture) {
   if (!email) { alert('No se pudo obtener el correo de Google.'); return; }
-  var users = getUsers();
-  var user = users.find(function (u) { return u.googleId === googleId; });
+  var sb = getSupabase();
+  var { data: user } = await sb.from('users').select('*').eq('google_id', googleId).maybeSingle();
   if (!user) {
-    user = users.find(function (u) { return u.email && u.email.toLowerCase() === email.toLowerCase(); });
-    if (user) {
-      user.googleId = googleId;
-      user.picture = picture || user.picture || '';
-      if (!user.icon || user.icon.length === 1) user.icon = displayName.charAt(0).toUpperCase() || user.username.charAt(0).toUpperCase();
-      saveUsers(users);
+    var { data: existing } = await sb.from('users').select('*').eq('email', email).maybeSingle();
+    if (existing) {
+      var upd = { google_id: googleId, picture: picture || existing.picture || '' };
+      if (!existing.icon || existing.icon.length === 1) upd.icon = displayName.charAt(0).toUpperCase() || existing.username.charAt(0).toUpperCase();
+      await sb.from('users').update(upd).eq('id', existing.id);
+      user = (await sb.from('users').select('*').eq('id', existing.id).single()).data;
     } else {
       var base = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '');
       var username = base;
       var suffix = 1;
-      while (users.some(function (u) { return u.username === username; })) { username = base + suffix; suffix++; }
-      users.push({
+      while (true) {
+        var { data: dup } = await sb.from('users').select('username').eq('username', username).maybeSingle();
+        if (!dup) break;
+        username = base + suffix; suffix++;
+      }
+      var { data: newUser, error } = await sb.from('users').insert({
         username: username,
-        passwordHash: '',
+        password_hash: 0,
         email: email,
         notifications: true,
         bio: '',
-        googleId: googleId,
+        google_id: googleId,
         icon: username.charAt(0).toUpperCase(),
         picture: picture || '',
         role: 'user',
-        permissions: [],
-        createdAt: new Date().toISOString()
-      });
-      saveUsers(users);
-      user = users[users.length - 1];
+        permissions: []
+      }).select().single();
+      if (error) { console.error('Google user insert error:', error); return; }
+      user = newUser;
     }
   }
   currentUser = user.username;
@@ -260,9 +278,8 @@ function base64url(buffer) {
 function startDiscordLogin() {
   if (!DISCORD_CLIENT_ID) { alert('Discord login no configurado.'); return; }
   var verifier = generateRandomString(64);
-  var challenge = base64url(new Uint8Array(1));
   crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)).then(function (hash) {
-    challenge = base64url(hash);
+    var challenge = base64url(hash);
     var state = generateRandomString(16);
     sessionStorage.setItem('discord_code_verifier', verifier);
     sessionStorage.setItem('discord_oauth_state', state);
@@ -282,39 +299,44 @@ function startDiscordLogin() {
   });
 }
 
-function loginWithDiscord(user) {
+async function loginWithDiscord(user) {
   if (!user || !user.id) return;
-  var users = getUsers();
-  var existing = users.find(function (u) { return u.discordId === user.id; });
+  var sb = getSupabase();
+  var { data: existing } = await sb.from('users').select('*').eq('discord_id', user.id).maybeSingle();
   if (!existing) {
-    existing = users.find(function (u) {
-      return user.email && u.email && u.email.toLowerCase() === user.email.toLowerCase();
-    });
-    if (existing) {
-      existing.discordId = user.id;
-      if (user.avatar) existing.picture = 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png';
-      saveUsers(users);
-    } else {
+    if (user.email) {
+      var { data: emailMatch } = await sb.from('users').select('*').eq('email', user.email).maybeSingle();
+      if (emailMatch) {
+        var upd = { discord_id: user.id };
+        if (user.avatar) upd.picture = 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png';
+        await sb.from('users').update(upd).eq('id', emailMatch.id);
+        existing = (await sb.from('users').select('*').eq('id', emailMatch.id).single()).data;
+      }
+    }
+    if (!existing) {
       var base = (user.name || user.id).replace(/[^a-zA-Z0-9_]/g, '').toLowerCase() || 'user';
       var username = base;
       var suffix = 1;
-      while (users.some(function (u) { return u.username === username; })) { username = base + suffix; suffix++; }
+      while (true) {
+        var { data: dup } = await sb.from('users').select('username').eq('username', username).maybeSingle();
+        if (!dup) break;
+        username = base + suffix; suffix++;
+      }
       var avatarUrl = user.avatar ? 'https://cdn.discordapp.com/avatars/' + user.id + '/' + user.avatar + '.png' : '';
-      users.push({
+      var { data: newUser, error } = await sb.from('users').insert({
         username: username,
-        passwordHash: '',
+        password_hash: 0,
         email: user.email || '',
         notifications: true,
         bio: '',
-        discordId: user.id,
+        discord_id: user.id,
         icon: username.charAt(0).toUpperCase(),
         picture: avatarUrl,
         role: 'user',
-        permissions: [],
-        createdAt: new Date().toISOString()
-      });
-      saveUsers(users);
-      existing = users[users.length - 1];
+        permissions: []
+      }).select().single();
+      if (error) { console.error('Discord user insert error:', error); return; }
+      existing = newUser;
     }
   }
   currentUser = existing.username;
@@ -350,6 +372,7 @@ function initGoogleSignIn() {
 }
 
 function formatDate(iso) {
+  if (!iso) return '';
   var d = new Date(iso);
   var now = new Date();
   var diff = Math.floor((now - d) / 1000);
@@ -361,6 +384,7 @@ function formatDate(iso) {
 }
 
 function escapeHtml(text) {
+  if (typeof text !== 'string') return '';
   var d = document.createElement('div');
   d.textContent = text;
   return d.innerHTML;
@@ -413,23 +437,25 @@ function renderAdminUI() {
       if (hasPermission('manage_notifications')) {
         var notifBtn = document.createElement('button');
         notifBtn.className = 'dropdown-item';
-        notifBtn.textContent = 'Enviar notificación';
+        notifBtn.textContent = 'Enviar notificaci\u00f3n';
         notifBtn.addEventListener('click', function (e) {
           e.stopPropagation();
-          var count = getNotifiedUsers().length;
-          if (!count) { alert('No hay usuarios registrados con correo y notificaciones activadas.'); return; }
-          document.getElementById('notif-count').textContent = count;
-          document.getElementById('notif-subject').value = '';
-          document.getElementById('notif-message').value = '';
-          document.getElementById('notif-result').style.display = 'none';
-          document.getElementById('notif-modal').classList.add('open');
+          getNotifiedUsers().then(function (notified) {
+            var count = notified.length;
+            if (!count) { alert('No hay usuarios registrados con correo y notificaciones activadas.'); return; }
+            document.getElementById('notif-count').textContent = count;
+            document.getElementById('notif-subject').value = '';
+            document.getElementById('notif-message').value = '';
+            document.getElementById('notif-result').style.display = 'none';
+            document.getElementById('notif-modal').classList.add('open');
+          });
         });
         menu.appendChild(notifBtn);
       }
     }
     var lo = document.createElement('button');
     lo.className = 'dropdown-logout-btn';
-    lo.textContent = 'Cerrar sesión';
+    lo.textContent = 'Cerrar sesi\u00f3n';
     lo.addEventListener('click', function (e) { e.stopPropagation(); logout(); if (typeof renderForum === 'function') renderForum(); });
     menu.appendChild(lo);
     wrap.appendChild(trigger);
@@ -437,46 +463,60 @@ function renderAdminUI() {
     status.parentNode.insertBefore(wrap, status.nextSibling);
   } else {
     btn.style.display = '';
-    btn.textContent = 'Iniciar sesión';
+    btn.textContent = 'Iniciar sesi\u00f3n';
     btn.className = 'btn btn-ghost';
   }
 }
 
 document.addEventListener('DOMContentLoaded', function initAuth() {
+  var sb = getSupabase();
+
   // Reset users if ?reset param
   var resetParam = new URLSearchParams(window.location.search).get('reset');
   if (resetParam === '1') {
-    localStorage.removeItem(USERS_KEY);
-    localStorage.removeItem(STORAGE_KEY);
-    var seed = [{
-      username: 'Kael Tharion',
-      passwordHash: hashPassword(ADMIN_PASSWORD),
-      email: '',
-      notifications: true,
-      bio: '',
-      googleId: '',
-      icon: 'K',
-      picture: '',
-      role: 'admin',
-      permissions: ALL_PERMS.slice(),
-      createdAt: new Date().toISOString()
-    }];
-    localStorage.setItem(USERS_KEY, JSON.stringify(seed));
+    (async function () {
+      await sb.from('users').delete().neq('id', 0);
+      await sb.from('entries').delete().neq('id', 0);
+      await sb.from('users').insert({
+        username: 'Kael Tharion',
+        password_hash: hashPassword(ADMIN_PASSWORD),
+        email: '',
+        notifications: true,
+        bio: '',
+        google_id: '',
+        discord_id: '',
+        icon: 'K',
+        picture: '',
+        role: 'admin',
+        permissions: ALL_PERMS
+      });
+      console.log('Database reset complete');
+    })();
   }
 
-  // Migrate existing users: ensure role, permissions, and Kael Tharion is admin
-  var allUsers = getUsers();
-  var changed = false;
-  allUsers.forEach(function (u) {
-    if (!u.role) { u.role = 'user'; changed = true; }
-    if (!u.permissions) { u.permissions = []; changed = true; }
-    if (u.username === 'Kael Tharion' && u.role !== 'admin') {
-      u.role = 'admin';
-      u.permissions = ALL_PERMS.slice();
-      changed = true;
+  // Ensure Kael Tharion exists with admin perms
+  (async function () {
+    var { data: kael } = await sb.from('users').select('*').eq('username', 'Kael Tharion').maybeSingle();
+    if (kael) {
+      if (kael.role !== 'admin') {
+        await sb.from('users').update({ role: 'admin', permissions: ALL_PERMS }).eq('username', 'Kael Tharion');
+      }
+    } else {
+      await sb.from('users').insert({
+        username: 'Kael Tharion',
+        password_hash: hashPassword(ADMIN_PASSWORD),
+        email: '',
+        notifications: true,
+        bio: '',
+        google_id: '',
+        discord_id: '',
+        icon: 'K',
+        picture: '',
+        role: 'admin',
+        permissions: ALL_PERMS
+      });
     }
-  });
-  if (changed) saveUsers(allUsers);
+  })();
 
   // Check for Discord OAuth result
   try {
@@ -576,10 +616,11 @@ document.addEventListener('DOMContentLoaded', function initAuth() {
     document.getElementById('login-error').style.display = 'none';
   });
 
-  document.getElementById('login-submit')?.addEventListener('click', function () {
+  document.getElementById('login-submit')?.addEventListener('click', async function () {
     var pwd = document.getElementById('login-password').value;
     var user = document.getElementById('login-username').value || 'Admin';
-    if (login(pwd, user)) {
+    var ok = await login(pwd, user);
+    if (ok) {
       renderAdminUI(); if (typeof renderForum === 'function') renderForum(); closeModal('login-modal');
     } else {
       document.getElementById('login-error').style.display = 'block';
@@ -603,7 +644,7 @@ document.addEventListener('DOMContentLoaded', function initAuth() {
     document.getElementById('register-modal').classList.add('open');
   });
 
-  document.getElementById('register-submit')?.addEventListener('click', function () {
+  document.getElementById('register-submit')?.addEventListener('click', async function () {
     var username = document.getElementById('register-username').value.trim();
     var email = document.getElementById('register-email').value.trim();
     var password = document.getElementById('register-password').value;
@@ -614,12 +655,14 @@ document.addEventListener('DOMContentLoaded', function initAuth() {
     if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { errorEl.textContent = 'Correo electr\u00f3nico no v\u00e1lido.'; errorEl.style.display = 'block'; return; }
     if (password.length < 4) { errorEl.textContent = 'La contrase\u00f1a debe tener al menos 4 caracteres.'; errorEl.style.display = 'block'; return; }
     if (password !== confirm) { errorEl.textContent = 'Las contrase\u00f1as no coinciden.'; errorEl.style.display = 'block'; return; }
-    var regResult = registerUser(username, password, email, notifications);
+    var regResult = await registerUser(username, password, email, notifications);
     if (regResult === 'username') { errorEl.textContent = 'El nombre de usuario ya est\u00e1 en uso.'; errorEl.style.display = 'block'; return; }
     if (regResult === 'email') { errorEl.textContent = 'El correo electr\u00f3nico ya est\u00e1 registrado.'; errorEl.style.display = 'block'; return; }
-    if (regResult !== true) { errorEl.textContent = 'El usuario ya existe.'; errorEl.style.display = 'block'; return; }
-    login(password, username);
-    renderAdminUI(); if (typeof renderForum === 'function') renderForum(); closeModal('register-modal');
+    if (regResult !== true) { errorEl.textContent = 'Error al crear la cuenta.'; errorEl.style.display = 'block'; return; }
+    var ok = await login(password, username);
+    if (ok) {
+      renderAdminUI(); if (typeof renderForum === 'function') renderForum(); closeModal('register-modal');
+    }
   });
 
   document.getElementById('register-cancel')?.addEventListener('click', function () { closeModal('register-modal'); });

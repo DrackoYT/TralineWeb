@@ -2,42 +2,51 @@ var editingId = null;
 var selectedCategory = 'General';
 
 var CATEGORIES = [
-  { id: 'General', icon: '', color: '#5dade2', desc: 'Discusión general y anuncios' },
+  { id: 'General', icon: '', color: '#5dade2', desc: 'Discusi\u00f3n general y anuncios' },
   { id: 'Normativa', icon: '', color: '#f0c040', desc: 'Reglas y directrices del gremio' },
   { id: 'Lore', icon: '', color: '#9b59b6', desc: 'Historia, facciones y personajes' },
   { id: 'Q&A', icon: '', color: '#58d68d', desc: 'Preguntas y respuestas sobre el gremio' }
 ];
 
-function createEntry(title, category, content) {
-  var entries = getEntries();
-  entries.unshift({
-    id: Date.now(), title: title, category: category, content: content,
-    author: currentUser, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+async function createEntry(title, category, content) {
+  var sb = getSupabase();
+  var { error } = await sb.from('entries').insert({
+    title: title,
+    category: category,
+    content: content,
+    author: currentUser,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
   });
-  saveEntries(entries);
+  if (error) { console.error('createEntry error:', error); return; }
   renderForum();
 }
 
-function updateEntry(id, title, category, content) {
-  var entries = getEntries();
-  var idx = entries.findIndex(function (e) { return e.id === id; });
-  if (idx === -1) return;
-  if (!hasPermission('manage_entries') && entries[idx].author !== currentUser) return;
-  entries[idx].title = title;
-  entries[idx].category = category;
-  entries[idx].content = content;
-  entries[idx].updatedAt = new Date().toISOString();
-  saveEntries(entries);
-  renderForum();
-}
-
-function deleteEntry(id) {
-  if (!confirm('¿Eliminar esta entrada?')) return;
-  var entries = getEntries();
+async function updateEntry(id, title, category, content) {
+  var sb = getSupabase();
+  var entries = await getEntries();
   var entry = entries.find(function (e) { return e.id === id; });
   if (!entry) return;
   if (!hasPermission('manage_entries') && entry.author !== currentUser) return;
-  saveEntries(entries.filter(function (e) { return e.id !== id; }));
+  var { error } = await sb.from('entries').update({
+    title: title,
+    category: category,
+    content: content,
+    updated_at: new Date().toISOString()
+  }).eq('id', id);
+  if (error) { console.error('updateEntry error:', error); return; }
+  renderForum();
+}
+
+async function deleteEntry(id) {
+  if (!confirm('\u00bfEliminar esta entrada?')) return;
+  var entries = await getEntries();
+  var entry = entries.find(function (e) { return e.id === id; });
+  if (!entry) return;
+  if (!hasPermission('manage_entries') && entry.author !== currentUser) return;
+  var sb = getSupabase();
+  var { error } = await sb.from('entries').delete().eq('id', id);
+  if (error) { console.error('deleteEntry error:', error); return; }
   renderForum();
 }
 
@@ -48,11 +57,11 @@ function entryExcerpt(html) {
   return text.substring(0, 120) + (text.length > 120 ? '...' : '');
 }
 
-function renderForum() {
+async function renderForum() {
   var container = document.getElementById('lore-forum');
   var tabsContainer = document.getElementById('category-tabs');
   if (!container || !tabsContainer) return;
-  var entries = getEntries();
+  var entries = await getEntries();
 
   tabsContainer.innerHTML = '';
   CATEGORIES.forEach(function (cat) {
@@ -89,7 +98,7 @@ function renderForum() {
   if (catEntries.length === 0) {
     var empty = document.createElement('div');
     empty.className = 'forum-empty';
-    empty.innerHTML = '<p class="forum-empty-text">No hay entradas en ' + selectedCategory + ' aún.</p>';
+    empty.innerHTML = '<p class="forum-empty-text">No hay entradas en ' + selectedCategory + ' a\u00fan.</p>';
     container.appendChild(empty);
     return;
   }
@@ -104,8 +113,8 @@ function renderForum() {
         '<p class="forum-card-excerpt">' + escapeHtml(entryExcerpt(entry.content)) + '</p>' +
         '<div class="forum-card-footer">' +
           '<span class="forum-card-author">por <span class="author-link" data-author="' + escapeHtml(entry.author) + '">' + escapeHtml(entry.author) + '</span></span>' +
-          '<span class="forum-card-date">' + formatDate(entry.createdAt) + '</span>' +
-          (entry.updatedAt !== entry.createdAt ? '<span class="forum-card-edited">editado</span>' : '') +
+          '<span class="forum-card-date">' + formatDate(entry.created_at) + '</span>' +
+          (entry.updated_at !== entry.created_at ? '<span class="forum-card-edited">editado</span>' : '') +
         '</div>' +
       '</div>';
     if (currentUser && (hasPermission('manage_entries') || entry.author === currentUser)) {
@@ -139,8 +148,8 @@ function renderForum() {
   });
 }
 
-function showEntry(id) {
-  var entries = getEntries();
+async function showEntry(id) {
+  var entries = await getEntries();
   var entry = entries.find(function (e) { return e.id === id; });
   if (!entry) return;
   var overlay = document.createElement('div');
@@ -153,7 +162,7 @@ function showEntry(id) {
     '<div class="modal-box modal-wide" style="max-width:80rem">' +
       '<div style="display:flex;align-items:center;gap:1rem;margin-bottom:2rem;flex-wrap:wrap">' +
         '<span class="forum-card-badge" style="background:' + catColor(entry.category) + '1a;color:' + catColor(entry.category) + '">' + entry.category + '</span>' +
-        '<span style="font-size:1.1rem;color:#5a6a7a">' + formatDate(entry.createdAt) + '</span>' +
+        '<span style="font-size:1.1rem;color:#5a6a7a">' + formatDate(entry.created_at) + '</span>' +
         '<span style="font-size:1.1rem;color:#8a9aaf;margin-left:auto">por <span class="author-link" data-author="' + escapeHtml(entry.author) + '" style="cursor:pointer;color:#9ec5ff">' + escapeHtml(entry.author) + '</span></span>' +
       '</div>' +
       '<h2 style="font-size:2rem;color:#e8edf2;margin:0 0 2rem;font-weight:600">' + escapeHtml(entry.title) + '</h2>' +
@@ -179,7 +188,7 @@ function catColor(catId) {
   return c ? c.color : '#8a9aaf';
 }
 
-function openEditor(id) {
+async function openEditor(id) {
   editingId = id || null;
   var modal = document.getElementById('editor-modal');
   var titleInput = document.getElementById('editor-title');
@@ -189,7 +198,7 @@ function openEditor(id) {
   var isAdmin = hasPermission('manage_entries');
 
   if (id) {
-    var entries = getEntries();
+    var entries = await getEntries();
     var entry = entries.find(function (e) { return e.id === id; });
     if (!entry) return;
     modalTitle.textContent = 'Editar entrada';
@@ -289,15 +298,12 @@ function initEditorToolbar() {
   }
 
   // --- Build toolbar ---
-
-  // Text style
   btn('bold', '<b>B</b>', 'Negrita');
   btn('italic', '<i>I</i>', 'Cursiva');
   btn('underline', '<u>U</u>', 'Subrayado');
   btn('strikeThrough', '<s>S</s>', 'Tachado');
   sep();
 
-  // Headings
   btn('formatBlock', 'H1', 'Encabezado 1', 'h1');
   btn('formatBlock', 'H2', 'Encabezado 2', 'h2');
   btn('formatBlock', 'H3', 'Encabezado 3', 'h3');
@@ -305,35 +311,29 @@ function initEditorToolbar() {
   fontSizeDropdown();
   sep();
 
-  // Color
   colorPicker('A', 'Color de texto', 'foreColor', '#d8dde2');
   colorPicker('<span style="background:#ff0;color:#000;padding:1px 3px;border-radius:2px">A</span>', 'Resaltado', 'backColor', '#ffff00');
   sep();
 
-  // Alignment
   btn('justifyLeft', '\u25C2', 'Alinear izquierda');
   btn('justifyCenter', '\u25C6', 'Centrar');
   btn('justifyRight', '\u25B8', 'Alinear derecha');
   btn('justifyFull', '\u2B0C', 'Justificar');
   sep();
 
-  // Lists
   btn('insertUnorderedList', '\u2022', 'Lista');
   btn('insertOrderedList', '1.', 'Lista numerada');
   sep();
 
-  // Insert
   btn('createLink', '\u2B98', 'Insertar enlace');
   btn('insertImage', '\u229E', 'Insertar imagen');
   btn('insertHorizontalRule', '\u2014', 'L\u00ednea horizontal');
   sep();
 
-  // Blocks
   btn('formatBlock', '\u275E', 'Cita', 'blockquote');
   btn('formatBlock', '{ }', 'C\u00f3digo', 'pre');
   sep();
 
-  // Undo / Redo
   btn('undo', '\u21A9', 'Deshacer');
   btn('redo', '\u21AA', 'Rehacer');
 }
@@ -348,14 +348,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   document.getElementById('editor-cancel')?.addEventListener('click', function () { closeModal('editor-modal'); });
-  document.getElementById('editor-save')?.addEventListener('click', function () {
+  document.getElementById('editor-save')?.addEventListener('click', async function () {
     var title = document.getElementById('editor-title').value.trim();
     var category = document.getElementById('editor-category').value;
     var content = document.getElementById('editor-content').innerHTML.trim();
-    if (!title) { alert('El título es obligatorio.'); return; }
-    if (!content || content === '<br>') { alert('El contenido no puede estar vacío.'); return; }
-    if (editingId) { updateEntry(editingId, title, category, content); }
-    else { createEntry(title, category, content); }
+    if (!title) { alert('El t\u00edtulo es obligatorio.'); return; }
+    if (!content || content === '<br>') { alert('El contenido no puede estar vac\u00edo.'); return; }
+    if (editingId) { await updateEntry(editingId, title, category, content); }
+    else { await createEntry(title, category, content); }
     closeModal('editor-modal');
   });
 });

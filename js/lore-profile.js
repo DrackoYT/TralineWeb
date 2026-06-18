@@ -3,7 +3,7 @@ function catColor(catId) {
   return colors[catId] || '#8a9aaf';
 }
 
-function renderProfile(username) {
+async function renderProfile(username) {
   var container = document.getElementById('profile-content');
   if (!container) return;
   container.innerHTML = '';
@@ -13,8 +13,8 @@ function renderProfile(username) {
     return;
   }
 
-  var profile = getUserProfile(username);
-  var allEntries = getEntries();
+  var profile = await getUserProfile(username);
+  var allEntries = await getEntries();
   var userEntries = allEntries.filter(function (e) { return e.author === username; });
   var isOwnProfile = currentUser && currentUser === username;
   var isAdminUser = isCurrentUserAdmin();
@@ -28,7 +28,7 @@ function renderProfile(username) {
   var picture = profile ? (profile.picture || '') : '';
   var icon = profile ? (profile.icon || username.charAt(0).toUpperCase()) : username.charAt(0).toUpperCase();
   var bio = profile ? (profile.bio || '') : '';
-  var joined = profile ? formatDate(profile.createdAt) : '';
+  var joined = profile ? formatDate(profile.created_at) : '';
 
   var avatarHtml;
   if (picture) {
@@ -44,7 +44,7 @@ function renderProfile(username) {
           avatarHtml +
           '<div style="flex:1;min-width:0">' +
             '<h1 style="font-size:2.2rem;color:#e8edf2;margin:0 0 0.2rem;font-weight:600">' + escapeHtml(username) + '</h1>' +
-            '<div style="font-size:1.3rem;color:#7a8a9a">@' + escapeHtml(username) + (isAdminUser ? ' <span style="color:#d4a840">· Admin</span>' : '') + '</div>' +
+            '<div style="font-size:1.3rem;color:#7a8a9a">@' + escapeHtml(username) + (isAdminUser ? ' <span style="color:#d4a840">\u00b7 Admin</span>' : '') + '</div>' +
             (joined ? '<div style="font-size:1.1rem;color:#5a6a7a;margin-top:0.3rem">Miembro desde ' + joined + '</div>' : '') +
           '</div>' +
           (isOwnProfile ? '<button id="edit-profile-btn" class="btn btn-ghost">Editar perfil</button>' : '') +
@@ -70,7 +70,7 @@ function renderProfile(username) {
         '<div class="forum-card-body">' +
           '<div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.3rem">' +
             '<span class="forum-card-badge" style="background:' + catColor(entry.category) + '1a;color:' + catColor(entry.category) + ';font-size:0.9rem">' + entry.category + '</span>' +
-            '<span style="font-size:1rem;color:#5a6a7a">' + formatDate(entry.createdAt) + '</span>' +
+            '<span style="font-size:1rem;color:#5a6a7a">' + formatDate(entry.created_at) + '</span>' +
           '</div>' +
           '<h3 class="forum-card-title" style="font-size:1.35rem">' + escapeHtml(entry.title) + '</h3>' +
           '<p class="forum-card-excerpt">' + escapeHtml((function(html){var d=document.createElement('div');d.innerHTML=html;return (d.textContent||d.innerText||'').substring(0,100);})(entry.content)) + '</p>' +
@@ -98,14 +98,14 @@ document.addEventListener('DOMContentLoaded', function () {
   var username = params.get('user');
   renderProfile(username);
 
-  document.getElementById('profile-save')?.addEventListener('click', function () {
+  document.getElementById('profile-save')?.addEventListener('click', async function () {
     var em = document.getElementById('profile-email').value.trim();
     var ic = document.getElementById('profile-icon').value.trim();
     var bi = document.getElementById('profile-bio').value.trim();
     var nt = document.getElementById('profile-notifications').checked;
     if (em && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { alert('Correo electr\u00f3nico no v\u00e1lido.'); return; }
     if (!currentUser) return;
-    updateUserProfile(currentUser, {
+    await updateUserProfile(currentUser, {
       email: em,
       icon: ic || currentUser.charAt(0).toUpperCase(),
       bio: bi,

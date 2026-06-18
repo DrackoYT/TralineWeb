@@ -63,9 +63,9 @@ function renderAdminSection(tabId) {
   }
 }
 
-function renderDashboard(container) {
-  var users = getUsers();
-  var entries = getEntries();
+async function renderDashboard(container) {
+  var users = await getUsers();
+  var entries = await getEntries();
   var catCounts = {};
   var CATS = { General: '#5dade2', Normativa: '#f0c040', Lore: '#9b59b6', 'Q&A': '#58d68d' };
   entries.forEach(function (e) { catCounts[e.category] = (catCounts[e.category] || 0) + 1; });
@@ -80,16 +80,16 @@ function renderDashboard(container) {
         return '<div class="admin-stat-card"><div class="admin-stat-value" style="color:' + CATS[c] + '">' + count + '</div><div class="admin-stat-label">' + c + '</div></div>';
       }).join('') +
     '</div>' +
-    '<h3 style="color:#e8edf2;margin:2rem 0 1rem;font-size:1.5rem;font-weight:500">Últimos usuarios registrados</h3>' +
+    '<h3 style="color:#e8edf2;margin:2rem 0 1rem;font-size:1.5rem;font-weight:500">\u00daltimos usuarios registrados</h3>' +
     (recentUsers.length ? '<table class="admin-table"><thead><tr><th>Usuario</th><th>Email</th><th>Fecha</th></tr></thead><tbody>' +
       recentUsers.map(function (u) {
-        return '<tr><td><span class="admin-user-icon">' + escapeHtml(u.icon || u.username.charAt(0).toUpperCase()) + '</span> ' + escapeHtml(u.username) + '</td><td>' + escapeHtml(u.email || '-') + '</td><td>' + formatDate(u.createdAt) + '</td></tr>';
+        return '<tr><td><span class="admin-user-icon">' + escapeHtml(u.icon || u.username.charAt(0).toUpperCase()) + '</span> ' + escapeHtml(u.username) + '</td><td>' + escapeHtml(u.email || '-') + '</td><td>' + formatDate(u.created_at) + '</td></tr>';
       }).join('') + '</tbody></table>' : '<p style="color:#5a6a7a">No hay usuarios registrados.</p>');
   container.innerHTML = html;
 }
 
-function renderUsers(container) {
-  var users = getUsers();
+async function renderUsers(container) {
+  var users = await getUsers();
   var canManage = hasPermission('manage_admins');
   var admins = users.filter(function (u) { return u.role === 'admin'; });
   var adminSection = '';
@@ -112,8 +112,9 @@ function renderUsers(container) {
     '<div class="admin-search-bar"><input type="text" id="admin-user-search" placeholder="Buscar usuario..." class="admin-search-input"></div>' +
     '<div id="admin-user-table-wrap">' + buildUserTable(users, '', canManage) + '</div>';
   container.innerHTML = html;
-  document.getElementById('admin-user-search')?.addEventListener('input', function () {
-    document.getElementById('admin-user-table-wrap').innerHTML = buildUserTable(getUsers(), this.value, canManage);
+  document.getElementById('admin-user-search')?.addEventListener('input', async function () {
+    var allUsers = await getUsers();
+    document.getElementById('admin-user-table-wrap').innerHTML = buildUserTable(allUsers, this.value, canManage);
   });
 }
 
@@ -159,21 +160,22 @@ function buildUserTable(users, query, canManage) {
     return '<tr>' +
       '<td><span class="admin-user-icon' + (isAdminUser ? ' admin-icon-gold' : '') + '">' + escapeHtml(u.icon || u.username.charAt(0).toUpperCase()) + '</span> ' + escapeHtml(u.username) + badge + '</td>' +
       '<td>' + escapeHtml(u.email || '-') + '</td>' +
-      '<td>' + formatDate(u.createdAt) + '</td>' +
+      '<td>' + formatDate(u.created_at) + '</td>' +
       '<td class="admin-actions-cell">' + actions + '</td></tr>';
   }).join('');
   return '<table class="admin-table"><thead><tr><th>Usuario</th><th>Email</th><th>Registro</th><th>Acciones</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
-function renderEntries(container) {
-  var entries = getEntries();
+async function renderEntries(container) {
+  var entries = await getEntries();
   var CATS = { General: '#5dade2', Normativa: '#f0c040', Lore: '#9b59b6', 'Q&A': '#58d68d' };
   var html =
     '<div class="admin-search-bar"><input type="text" id="admin-entry-search" placeholder="Buscar entrada..." class="admin-search-input"></div>' +
     '<div id="admin-entry-table-wrap">' + buildEntryTable(entries, '', CATS) + '</div>';
   container.innerHTML = html;
-  document.getElementById('admin-entry-search')?.addEventListener('input', function () {
-    document.getElementById('admin-entry-table-wrap').innerHTML = buildEntryTable(getEntries(), this.value, CATS);
+  document.getElementById('admin-entry-search')?.addEventListener('input', async function () {
+    var allEntries = await getEntries();
+    document.getElementById('admin-entry-table-wrap').innerHTML = buildEntryTable(allEntries, this.value, CATS);
   });
 }
 
@@ -189,32 +191,34 @@ function buildEntryTable(entries, query, CATS) {
       '<td class="admin-entry-title">' + escapeHtml(e.title) + '</td>' +
       '<td>' + escapeHtml(e.author) + '</td>' +
       '<td><span class="forum-card-badge" style="background:' + (CATS[e.category] || '#8a9aaf') + '1a;color:' + (CATS[e.category] || '#8a9aaf') + ';font-size:0.9rem">' + escapeHtml(e.category) + '</span></td>' +
-      '<td>' + formatDate(e.createdAt) + '</td>' +
+      '<td>' + formatDate(e.created_at) + '</td>' +
       '<td class="admin-actions-cell">' +
         '<button class="btn btn-sm btn-ghost admin-action-btn" data-action="view" data-id="' + e.id + '">Ver</button>' +
         '<button class="btn btn-sm btn-ghost admin-action-btn" data-action="edit" data-id="' + e.id + '">Editar</button>' +
         '<button class="btn btn-sm btn-delete admin-action-btn" data-action="delete" data-id="' + e.id + '">Eliminar</button>' +
       '</td></tr>';
   }).join('');
-  return '<table class="admin-table"><thead><tr><th>Título</th><th>Autor</th><th>Categoría</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  return '<table class="admin-table"><thead><tr><th>T\u00edtulo</th><th>Autor</th><th>Categor\u00eda</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
 function renderNotifications(container) {
-  var count = getNotifiedUsers().length;
-  var html =
-    '<div class="admin-notif-section">' +
-      '<p style="color:#8a9aaf;font-size:1.3rem;margin-bottom:1.5rem">Enviar un correo a todos los usuarios que tengan notificaciones activadas.</p>' +
-      '<p style="color:#5a6a7a;font-size:1.2rem;margin-bottom:2rem">Usuarios receptores: <strong style="color:#e8edf2">' + count + '</strong></p>' +
-      '<button class="btn btn-primary" id="admin-open-notif">Redactar notificación</button>' +
-    '</div>';
-  container.innerHTML = html;
-  document.getElementById('admin-open-notif')?.addEventListener('click', function () {
-    if (!count) { alert('No hay usuarios registrados con correo y notificaciones activadas.'); return; }
-    document.getElementById('notif-count').textContent = count;
-    document.getElementById('notif-subject').value = '';
-    document.getElementById('notif-message').value = '';
-    document.getElementById('notif-result').style.display = 'none';
-    document.getElementById('notif-modal').classList.add('open');
+  getNotifiedUsers().then(function (notified) {
+    var count = notified.length;
+    var html =
+      '<div class="admin-notif-section">' +
+        '<p style="color:#8a9aaf;font-size:1.3rem;margin-bottom:1.5rem">Enviar un correo a todos los usuarios que tengan notificaciones activadas.</p>' +
+        '<p style="color:#5a6a7a;font-size:1.2rem;margin-bottom:2rem">Usuarios receptores: <strong style="color:#e8edf2">' + count + '</strong></p>' +
+        '<button class="btn btn-primary" id="admin-open-notif">Redactar notificaci\u00f3n</button>' +
+      '</div>';
+    container.innerHTML = html;
+    document.getElementById('admin-open-notif')?.addEventListener('click', function () {
+      if (!count) { alert('No hay usuarios registrados con correo y notificaciones activadas.'); return; }
+      document.getElementById('notif-count').textContent = count;
+      document.getElementById('notif-subject').value = '';
+      document.getElementById('notif-message').value = '';
+      document.getElementById('notif-result').style.display = 'none';
+      document.getElementById('notif-modal').classList.add('open');
+    });
   });
 }
 
@@ -228,27 +232,25 @@ document.addEventListener('click', function (e) {
       if (action === 'view') {
         openProfileView(username);
       } else if (action === 'delete') {
-        if (!confirm('¿Eliminar al usuario "' + username + '"?')) return;
-        var users = getUsers();
-        saveUsers(users.filter(function (u) { return u.username !== username; }));
-        renderAdminSection(adminActiveTab);
+        (async function () {
+          if (!confirm('\u00bfEliminar al usuario "' + username + '"?')) return;
+          var sb = getSupabase();
+          await sb.from('users').delete().eq('username', username);
+          renderAdminSection(adminActiveTab);
+        })();
       } else if (action === 'promote') {
-        users = getUsers();
-        var u = users.find(function (x) { return x.username === username; });
-        if (!u) return;
-        u.role = 'admin';
-        u.permissions = ['manage_entries'];
-        saveUsers(users);
-        renderAdminSection(adminActiveTab);
+        (async function () {
+          var sb = getSupabase();
+          await sb.from('users').update({ role: 'admin', permissions: ['manage_entries'] }).eq('username', username);
+          renderAdminSection(adminActiveTab);
+        })();
       } else if (action === 'demote') {
-        if (!confirm('¿Quitar permisos de administrador a "' + username + '"?')) return;
-        users = getUsers();
-        u = users.find(function (x) { return x.username === username; });
-        if (!u) return;
-        u.role = 'user';
-        u.permissions = [];
-        saveUsers(users);
-        renderAdminSection(adminActiveTab);
+        if (!confirm('\u00bfQuitar permisos de administrador a "' + username + '"?')) return;
+        (async function () {
+          var sb = getSupabase();
+          await sb.from('users').update({ role: 'user', permissions: [] }).eq('username', username);
+          renderAdminSection(adminActiveTab);
+        })();
       }
     } else if (btn.dataset.id) {
       var id = parseInt(btn.dataset.id, 10);
@@ -257,12 +259,12 @@ document.addEventListener('click', function (e) {
       } else if (action === 'edit') {
         window.location.href = '/lore.html?edit=' + id;
       } else if (action === 'delete') {
-        if (!confirm('¿Eliminar esta entrada?')) return;
-        var entries = getEntries();
-        var entry = entries.find(function (e) { return e.id === id; });
-        if (!entry) return;
-        saveEntries(entries.filter(function (e) { return e.id !== id; }));
-        renderAdminSection(adminActiveTab);
+        (async function () {
+          if (!confirm('\u00bfEliminar esta entrada?')) return;
+          var sb = getSupabase();
+          await sb.from('entries').delete().eq('id', id);
+          renderAdminSection(adminActiveTab);
+        })();
       }
     }
     return;
@@ -271,17 +273,20 @@ document.addEventListener('click', function (e) {
   var toggle = e.target.closest('.admin-perm-toggle');
   if (toggle) {
     e.preventDefault();
-    var perm = toggle.dataset.perm;
-    var username = toggle.dataset.user;
-    var users = getUsers();
-    var u = users.find(function (x) { return x.username === username; });
-    if (!u || !u.permissions) return;
-    var idx = u.permissions.indexOf(perm);
-    if (idx === -1) { u.permissions.push(perm); }
-    else { u.permissions.splice(idx, 1); }
-    saveUsers(users);
-    toggle.classList.toggle('active');
-    var cb = toggle.querySelector('input[type=checkbox]');
-    if (cb) cb.checked = idx === -1;
+    (async function () {
+      var perm = toggle.dataset.perm;
+      var username = toggle.dataset.user;
+      var sb = getSupabase();
+      var { data: u } = await sb.from('users').select('*').eq('username', username).single();
+      if (!u || !u.permissions) return;
+      var idx = u.permissions.indexOf(perm);
+      var newPerms = u.permissions.slice();
+      if (idx === -1) { newPerms.push(perm); }
+      else { newPerms.splice(idx, 1); }
+      await sb.from('users').update({ permissions: newPerms }).eq('username', username);
+      toggle.classList.toggle('active');
+      var cb = toggle.querySelector('input[type=checkbox]');
+      if (cb) cb.checked = idx === -1;
+    })();
   }
 });
