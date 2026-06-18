@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="Entrada del foro de Traline.">
+    <meta property="og:title" content="Traline — Entrada">
+    <meta property="og:description" content="Entrada del foro del gremio Traline en MineShoku Tensei.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://traline.vercel.app/entry">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Traline — Entrada">
+    <meta name="twitter:description" content="Entrada del foro del gremio Traline en MineShoku Tensei.">
+    <title>Traline — Entrada</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <nav class="navbar">
+        <div class="nav-logo">Traline</div>
+        <div class="nav-menu">
+            <ul class="nav-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/cargos.html">Rangos</a></li>
+                <li><a href="/lore.html">Foro</a></li>
+            </ul>
+            <span id="admin-status" class="admin-badge"></span>
+            <button id="admin-btn" class="btn btn-ghost">Iniciar sesión</button>
+            <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
+        </div>
+        <button class="nav-toggle" aria-label="Menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <main id="main-content" class="lore-page">
+        <div class="lore-header">
+            <a href="/lore.html" class="btn btn-ghost" style="margin-bottom:1rem;border-color:transparent">&larr; Volver al foro</a>
+            <h1 class="lore-title" id="entry-title">Entrada</h1>
+        </div>
+        <div id="entry-container" class="lore-list"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-contenido">
+            <div class="footer-logo">Traline</div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/cargos.html">Rangos</a></li>
+                <li><a href="/lore.html">Foro</a></li>
+            </ul>
+            <p class="footer-copyright">© 2026 Traline. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Login -->
+    <div id="login-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Iniciar sesión</h3>
+            <div class="modal-body">
+                <input type="text" id="login-username" placeholder="Usuario">
+                <input type="password" id="login-password" placeholder="Contraseña">
+                <div class="google-divider"><span>o</span></div>
+                <button type="button" class="google-signin-btn">Iniciar sesión con Google</button>
+                <button type="button" class="discord-signin-btn">Iniciar sesión con Discord</button>
+                <p id="login-error" class="text-error">Contraseña incorrecta</p>
+            </div>
+            <div class="modal-footer">
+                <button id="login-cancel" class="btn btn-ghost">Cancelar</button>
+                <button id="login-register" class="btn btn-ghost" style="margin-right:auto">Crear cuenta</button>
+                <button id="login-submit" class="btn btn-primary">Entrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register -->
+    <div id="register-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Crear cuenta</h3>
+            <div class="modal-body">
+                <input type="text" id="register-username" placeholder="Nombre de usuario">
+                <input type="email" id="register-email" placeholder="Correo electrónico">
+                <input type="password" id="register-password" placeholder="Contraseña">
+                <input type="password" id="register-confirm" placeholder="Confirmar contraseña">
+                <label class="checkbox-label"><input type="checkbox" id="register-notifications" checked> Acepto recibir notificaciones por correo</label>
+                <div class="google-divider"><span>o</span></div>
+                <button type="button" class="google-signin-btn">Crear cuenta con Google</button>
+                <button type="button" class="discord-signin-btn">Crear cuenta con Discord</button>
+                <p id="register-error" class="text-error"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="register-cancel" class="btn btn-ghost">Cancelar</button>
+                <button id="register-login" class="btn btn-ghost" style="margin-right:auto">Iniciar sesión</button>
+                <button id="register-submit" class="btn btn-primary">Crear cuenta</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor -->
+    <div id="editor-modal" class="modal-overlay">
+        <div class="modal-box modal-wide">
+            <h3 id="editor-modal-title">Editar entrada</h3>
+            <div class="modal-body">
+                <input type="text" id="editor-title" placeholder="Título">
+                <select id="editor-category">
+                    <option value="Q&A">Q&A</option>
+                    <option value="Lore">Lore</option>
+                    <option value="Normativa">Normativa</option>
+                    <option value="General">General</option>
+                </select>
+                <div class="editor-wrapper">
+                    <div id="editor-toolbar" class="editor-toolbar"></div>
+                    <div id="editor-content" class="editor-content" contenteditable="true"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="editor-cancel" class="btn btn-ghost">Cancelar</button>
+                <button id="editor-save" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-top" aria-label="Volver arriba">↑</button>
+
+    <script src="js/particles.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/lore-auth.js"></script>
+    <script src="js/lore-editor.js"></script>
+    <script src="js/lore-entry.js"></script>
+    <script>
+        const nav = document.querySelector('.navbar');
+        const toggle = document.querySelector('.nav-toggle');
+        toggle?.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('nav-open');
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && nav.classList.contains('nav-open')) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.focus();
+            }
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+        const backToTop = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('visible', window.scrollY > 500);
+        }, { passive: true });
+        backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    </script>
+</body>
+</html>

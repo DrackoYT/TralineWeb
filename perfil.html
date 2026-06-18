@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="description" content="Perfil de usuario de Traline.">
+    <meta property="og:title" content="Traline — Perfil">
+    <meta property="og:description" content="Perfil de usuario del foro de Traline.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://traline.vercel.app/perfil">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Traline — Perfil">
+    <meta name="twitter:description" content="Perfil de usuario del foro de Traline.">
+    <title>Traline — Perfil</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+    <nav class="navbar">
+        <div class="nav-logo">Traline</div>
+        <div class="nav-menu">
+            <ul class="nav-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/cargos.html">Rangos</a></li>
+                <li><a href="/lore.html">Foro</a></li>
+            </ul>
+            <span id="admin-status" class="admin-badge"></span>
+            <button id="admin-btn" class="btn btn-ghost">Iniciar sesión</button>
+            <a href="https://discord.gg/WXPdbU4JYR" class="BotonDiscord">Únete al discord!</a>
+        </div>
+        <button class="nav-toggle" aria-label="Menú" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <main id="main-content" class="lore-page">
+        <div id="profile-content"></div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-contenido">
+            <div class="footer-logo">Traline</div>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="/cargos.html">Rangos</a></li>
+                <li><a href="/lore.html">Foro</a></li>
+            </ul>
+            <p class="footer-copyright">&copy; 2026 Traline. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Profile Edit -->
+    <div id="profile-edit-modal" class="modal-overlay">
+        <div class="modal-box">
+            <h3>Editar perfil</h3>
+            <div class="modal-body">
+                <input type="email" id="profile-email" placeholder="Correo electrónico">
+                <input type="text" id="profile-icon" placeholder="Icono (un emoji)" maxlength="2">
+                <textarea id="profile-bio" placeholder="Biografía" rows="3" style="background:#0b0f14;border:1px solid #243044;border-radius:6px;padding:0.9rem 1.2rem;color:#e8edf2;font-size:1.35rem;font-family:inherit;outline:none;width:100%;box-sizing:border-box;resize:vertical"></textarea>
+                <label class="checkbox-label"><input type="checkbox" id="profile-notifications"> Acepto recibir notificaciones por correo</label>
+            </div>
+            <div class="modal-footer">
+                <button id="profile-cancel" class="btn btn-ghost">Cancelar</button>
+                <button id="profile-save" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="back-to-top" aria-label="Volver arriba">↑</button>
+
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/lore-auth.js"></script>
+    <script src="js/lore-profile.js"></script>
+    <script>
+        const nav = document.querySelector('.navbar');
+        const toggle = document.querySelector('.nav-toggle');
+        toggle?.addEventListener('click', () => {
+            const isOpen = nav.classList.toggle('nav-open');
+            toggle.setAttribute('aria-expanded', isOpen);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && nav.classList.contains('nav-open')) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+                toggle.focus();
+            }
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (nav.classList.contains('nav-open') && !nav.contains(e.target)) {
+                nav.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+        const backToTop = document.querySelector('.back-to-top');
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('visible', window.scrollY > 500);
+        }, { passive: true });
+        backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    </script>
+</body>
+</html>
