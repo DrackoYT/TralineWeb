@@ -2291,3 +2291,59 @@ a:hover {
 @media (min-width: 769px) {
     .admin-stats-grid { grid-template-columns: repeat(3, 1fr); }
 }
+
+/* Reactions */
+.lore-reactions { margin-top: 1.5rem; }
+.reactions-bar {
+    display: flex; gap: 0.4rem; flex-wrap: wrap;
+    padding: 0.8rem 0; border-top: 1px solid #1a2430; border-bottom: 1px solid #1a2430;
+}
+.reaction-btn {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    background: #0b0f14; border: 1px solid #1a2430; border-radius: 20px;
+    padding: 0.3rem 0.8rem; font-size: 1.3rem; cursor: pointer;
+    transition: all 0.15s; color: #8a9aaf;
+}
+.reaction-btn:hover { background: #121a24; border-color: #2a3a4a; }
+.reaction-btn.active { background: #0d1a2e; border-color: #3d6a9a; }
+.reaction-count { font-size: 1.1rem; font-family: 'Inter', 'Montserrat', sans-serif; line-height: 1; }
+
+/* Comments */
+.lore-comments { margin-top: 2rem; }
+.comments-section { background: #0e141b; border: 1px solid #1a2430; border-radius: 8px; padding: 2rem; }
+.comments-title { font-size: 1.6rem; font-weight: 600; color: #e8edf2; margin: 0 0 1.5rem 0; }
+
+.comment-form { margin-bottom: 2rem; display: flex; flex-direction: column; gap: 0.8rem; }
+.comment-input {
+    background: #0b0f14; border: 1px solid #1a2430; border-radius: 6px;
+    color: #d8dde2; font-family: 'Inter', 'Montserrat', sans-serif;
+    font-size: 1.3rem; padding: 1rem; resize: vertical;
+    width: 100%; box-sizing: border-box;
+}
+.comment-input:focus { outline: none; border-color: #3d6a9a; }
+
+.comment {
+    border-top: 1px solid #1a2430; padding: 1.2rem 0;
+}
+.comment:last-of-type { border-bottom: 1px solid #1a2430; }
+
+.comment-header {
+    display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; flex-wrap: wrap;
+}
+.comment-author {
+    color: #9ec5ff; font-size: 1.3rem; font-weight: 600; cursor: pointer;
+}
+.comment-author:hover { text-decoration: underline; }
+.comment-date {
+    color: #5a6a7a; font-size: 1.1rem;
+}
+.comment-delete { margin-left: auto; }
+
+.comment-body {
+    color: #c8d0d8; font-size: 1.35rem; line-height: 1.6;
+    font-family: 'Inter', 'Montserrat', sans-serif;
+    white-space: pre-wrap; word-wrap: break-word;
+}
+
+.comment-reactions { margin-top: 0.5rem; }
+.comment-reactions .reactions-bar { padding: 0.4rem 0; border: none; }

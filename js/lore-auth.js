@@ -4,7 +4,7 @@ var USERS_KEY = 'traline_users';
 var ADMIN_PASSWORD = 'traline2024';
 var GOOGLE_CLIENT_ID = '1061389217388-d9utb39d4hh7heq2crlmff8sl5nojl4p.apps.googleusercontent.com';
 var DISCORD_CLIENT_ID = '1515996446464278590';
-var ALL_PERMS = ['manage_users', 'manage_entries', 'manage_notifications', 'manage_admins'];
+var ALL_PERMS = ['manage_users', 'manage_entries', 'manage_notifications', 'manage_admins', 'manage_comments'];
 var currentUser = null;
 
 async function getEntries() {
@@ -90,7 +90,7 @@ async function updateUserProfile(username, updates) {
 
 function isCurrentUserAdmin() {
   try {
-    var stored = sessionStorage.getItem('traline_admin');
+    var stored = localStorage.getItem('traline_admin');
     if (stored) { var data = JSON.parse(stored); return data.isAdmin === true; }
   } catch (e) {}
   return false;
@@ -98,7 +98,7 @@ function isCurrentUserAdmin() {
 
 function hasPermission(perm) {
   try {
-    var stored = sessionStorage.getItem('traline_admin');
+    var stored = localStorage.getItem('traline_admin');
     if (stored) {
       var data = JSON.parse(stored);
       return data.isAdmin === true && data.permissions && data.permissions.indexOf(perm) !== -1;
@@ -109,7 +109,7 @@ function hasPermission(perm) {
 
 function getCurrentUserPerms() {
   try {
-    var stored = sessionStorage.getItem('traline_admin');
+    var stored = localStorage.getItem('traline_admin');
     if (stored) {
       var data = JSON.parse(stored);
       return data.permissions || [];
@@ -120,7 +120,7 @@ function getCurrentUserPerms() {
 
 function checkSession() {
   try {
-    var stored = sessionStorage.getItem('traline_admin');
+    var stored = localStorage.getItem('traline_admin');
     if (stored) {
       var data = JSON.parse(stored);
       if (data.expiry > Date.now()) { currentUser = data.user; return true; }
@@ -130,10 +130,10 @@ function checkSession() {
 }
 
 function saveSession(user, isAdmin, permissions) {
-  sessionStorage.setItem('traline_admin', JSON.stringify({ user: user, expiry: Date.now() + 3600000, isAdmin: isAdmin, permissions: permissions || [] }));
+  localStorage.setItem('traline_admin', JSON.stringify({ user: user, expiry: Date.now() + 2592000000, isAdmin: isAdmin, permissions: permissions || [] }));
 }
 
-function clearSession() { sessionStorage.removeItem('traline_admin'); currentUser = null; }
+function clearSession() { localStorage.removeItem('traline_admin'); currentUser = null; }
 
 async function login(password, username) {
   var sb = getSupabase();

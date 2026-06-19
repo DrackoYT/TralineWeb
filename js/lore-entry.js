@@ -18,6 +18,14 @@ document.addEventListener('DOMContentLoaded', function () {
     document.title = escapeHtml(entry.title) + ' \u2014 Traline';
     document.getElementById('entry-title').textContent = escapeHtml(entry.title);
     renderEntry(entry);
+    var reactionsContainer = document.getElementById('reactions-bar');
+    if (reactionsContainer) {
+      getReactions(id, null).then(function (reactions) {
+        renderReactions(reactionsContainer, id, null, reactions);
+      });
+    }
+    var commentsContainer = document.getElementById('comments-section');
+    if (commentsContainer) renderComments(commentsContainer, id);
   });
   var saveBtn = document.getElementById('editor-save');
   if (saveBtn) {

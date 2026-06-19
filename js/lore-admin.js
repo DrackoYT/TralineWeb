@@ -2,6 +2,7 @@ var ADMIN_TABS = [
   { id: 'dashboard', icon: '', label: 'Dashboard' },
   { id: 'users', icon: '', label: 'Usuarios' },
   { id: 'entries', icon: '', label: 'Entradas' },
+  { id: 'comments', icon: '', label: 'Comentarios' },
   { id: 'notifications', icon: '', label: 'Notificaciones' }
 ];
 var adminActiveTab = 'dashboard';
@@ -10,7 +11,8 @@ var PERM_LABELS = {
   manage_users: 'Usuarios',
   manage_entries: 'Entradas',
   manage_notifications: 'Notificaciones',
-  manage_admins: 'Admins'
+  manage_admins: 'Admins',
+  manage_comments: 'Comentarios'
 };
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -38,6 +40,7 @@ function renderAdminTabs() {
   ADMIN_TABS.forEach(function (tab) {
     if (tab.id === 'users' && !hasPermission('manage_users') && !hasPermission('manage_admins')) return;
     if (tab.id === 'entries' && !hasPermission('manage_entries')) return;
+    if (tab.id === 'comments' && !hasPermission('manage_comments')) return;
     if (tab.id === 'notifications' && !hasPermission('manage_notifications')) return;
     var btn = document.createElement('button');
     btn.className = 'admin-tab' + (tab.id === adminActiveTab ? ' active' : '');
@@ -59,6 +62,7 @@ function renderAdminSection(tabId) {
     case 'dashboard': renderDashboard(container); break;
     case 'users': renderUsers(container); break;
     case 'entries': renderEntries(container); break;
+    case 'comments': renderCommentsAdmin(container); break;
     case 'notifications': renderNotifications(container); break;
   }
 }
@@ -201,6 +205,44 @@ function buildEntryTable(entries, query, CATS) {
   return '<table class="admin-table"><thead><tr><th>T\u00edtulo</th><th>Autor</th><th>Categor\u00eda</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
+function renderCommentsAdmin(container) {
+  var sb = getSupabase();
+  sb.from('comments').select('*').order('created_at', { ascending: false }).then(function ({ data: comments }) {
+    comments = comments || [];
+    var html =
+      '<div class="admin-search-bar"><input type="text" id="admin-comment-search" placeholder="Buscar comentario..." class="admin-search-input"></div>' +
+      '<div id="admin-comment-table-wrap">' + buildCommentTable(comments, '', sb) + '</div>';
+    container.innerHTML = html;
+    document.getElementById('admin-comment-search')?.addEventListener('input', function () {
+      var q = this.value;
+      sb.from('comments').select('*').order('created_at', { ascending: false }).then(function ({ data: all }) {
+        document.getElementById('admin-comment-table-wrap').innerHTML = buildCommentTable(all || [], q, sb);
+      });
+    });
+  });
+}
+
+function buildCommentTable(comments, query) {
+  var filtered = comments;
+  if (query) {
+    var q = query.toLowerCase();
+    filtered = comments.filter(function (c) { return c.author.toLowerCase().indexOf(q) !== -1 || c.content.toLowerCase().indexOf(q) !== -1 || String(c.entry_id).indexOf(q) !== -1; });
+  }
+  if (!filtered.length) return '<div class="forum-empty"><p class="forum-empty-text">' + (query ? 'No se encontraron comentarios.' : 'No hay comentarios.') + '</p></div>';
+  var rows = filtered.map(function (c) {
+    var preview = c.content.length > 80 ? c.content.substring(0, 80) + '...' : c.content;
+    return '<tr>' +
+      '<td><a href="/entry/' + c.entry_id + '" style="color:#9ec5ff;text-decoration:none">#' + c.entry_id + '</a></td>' +
+      '<td>' + escapeHtml(c.author) + '</td>' +
+      '<td>' + escapeHtml(preview) + '</td>' +
+      '<td>' + formatDate(c.created_at) + '</td>' +
+      '<td class="admin-actions-cell">' +
+        '<button class="btn btn-sm btn-delete admin-action-btn" data-action="delete-comment" data-id="' + c.id + '">Eliminar</button>' +
+      '</td></tr>';
+  }).join('');
+  return '<table class="admin-table"><thead><tr><th>Entrada</th><th>Autor</th><th>Comentario</th><th>Fecha</th><th>Acciones</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
 function renderNotifications(container) {
   getNotifiedUsers().then(function (notified) {
     var count = notified.length;
@@ -263,6 +305,14 @@ document.addEventListener('click', function (e) {
           if (!confirm('\u00bfEliminar esta entrada?')) return;
           var sb = getSupabase();
           await sb.from('entries').delete().eq('id', id);
+          renderAdminSection(adminActiveTab);
+        })();
+      } else if (action === 'delete-comment') {
+        (async function () {
+          if (!confirm('\u00bfEliminar este comentario?')) return;
+          var sb = getSupabase();
+          await sb.from('reactions').delete().eq('comment_id', id);
+          await sb.from('comments').delete().eq('id', id);
           renderAdminSection(adminActiveTab);
         })();
       }
