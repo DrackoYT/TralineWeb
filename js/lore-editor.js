@@ -208,8 +208,6 @@ async function openEditor(id) {
     categorySelect.style.display = isAdmin ? '' : 'none';
   } else {
     modalTitle.textContent = 'Nueva entrada';
-    titleInput.value = '';
-    contentInput.innerHTML = '';
     if (!isAdmin) {
       categorySelect.value = 'General';
       categorySelect.style.display = 'none';
@@ -347,6 +345,10 @@ document.addEventListener('DOMContentLoaded', function () {
     if (editId) openEditor(editId);
   }
 
+  document.getElementById('editor-clear')?.addEventListener('click', function () {
+    document.getElementById('editor-title').value = '';
+    document.getElementById('editor-content').innerHTML = '';
+  });
   document.getElementById('editor-cancel')?.addEventListener('click', function () { closeModal('editor-modal'); });
   document.getElementById('editor-save')?.addEventListener('click', async function () {
     var title = document.getElementById('editor-title').value.trim();
@@ -356,6 +358,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!content || content === '<br>') { alert('El contenido no puede estar vac\u00edo.'); return; }
     if (editingId) { await updateEntry(editingId, title, category, content); }
     else { await createEntry(title, category, content); }
+    document.getElementById('editor-title').value = '';
+    document.getElementById('editor-content').innerHTML = '';
     closeModal('editor-modal');
   });
 });
