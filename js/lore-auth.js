@@ -528,7 +528,16 @@ document.addEventListener('DOMContentLoaded', function initAuth() {
     }
   } catch (e) {}
 
-  if (checkSession()) renderAdminUI();
+  if (checkSession()) {
+    renderAdminUI();
+    (async function () {
+      var user = await getUserProfile(currentUser);
+      if (user) {
+        saveSession(currentUser, user.role === 'admin', user.role === 'admin' && user.permissions ? user.permissions : []);
+        renderAdminUI();
+      }
+    })();
+  }
 
   // Build modals if not present
   if (!document.getElementById('login-modal')) {

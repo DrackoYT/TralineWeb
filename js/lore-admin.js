@@ -241,7 +241,7 @@ document.addEventListener('click', function (e) {
       } else if (action === 'promote') {
         (async function () {
           var sb = getSupabase();
-          await sb.from('users').update({ role: 'admin', permissions: ['manage_entries'] }).eq('username', username);
+          await sb.from('users').update({ role: 'admin', permissions: ALL_PERMS }).eq('username', username);
           renderAdminSection(adminActiveTab);
         })();
       } else if (action === 'demote') {
