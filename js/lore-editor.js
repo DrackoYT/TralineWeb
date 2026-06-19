@@ -131,7 +131,7 @@ async function renderForum() {
   document.querySelectorAll('#lore-forum .forum-card').forEach(function (card) {
     card.addEventListener('click', function (e) {
       if (e.target.closest('.btn') || e.target.closest('.author-link')) return;
-      window.location.href = '/entry.html?id=' + parseInt(this.dataset.entryId);
+      window.location.href = '/entry/' + parseInt(this.dataset.entryId);
     });
   });
   document.querySelectorAll('#lore-forum .btn-edit').forEach(function (btn) {

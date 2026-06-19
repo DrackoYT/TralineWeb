@@ -255,7 +255,7 @@ document.addEventListener('click', function (e) {
     } else if (btn.dataset.id) {
       var id = parseInt(btn.dataset.id, 10);
       if (action === 'view') {
-        window.location.href = '/entry.html?id=' + id;
+        window.location.href = '/entry/' + id;
       } else if (action === 'edit') {
         window.location.href = '/lore.html?edit=' + id;
       } else if (action === 'delete') {

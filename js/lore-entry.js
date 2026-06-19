@@ -2,6 +2,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var params = new URLSearchParams(window.location.search);
   var id = parseInt(params.get('id'), 10);
   if (!id) {
+    var match = window.location.pathname.match(/\/entry\/(\d+)/);
+    if (match) id = parseInt(match[1], 10);
+  }
+  if (!id) {
     document.getElementById('entry-container').innerHTML = '<div class="forum-empty"><p class="forum-empty-text">Entrada no encontrada.</p></div>';
     return;
   }
