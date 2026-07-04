@@ -1,6 +1,10 @@
 export default async function handler(req, res) {
-  const SUPABASE_URL = process.env.SUPABASE_URL || 'https://qxorzwqxtakdtxehbsly.supabase.co';
-  const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4b3J6d3F4dGFrZHR4ZWhic2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1MjY4MjksImV4cCI6MjA5NzEwMjgyOX0.VIxFh3innHtU2bpghtDnYtTDA9uWkSmHH7h5XPDtXqI';
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    return res.status(500).json({ status: 'error', message: 'Supabase no configurado. Define SUPABASE_URL y SUPABASE_ANON_KEY en las variables de entorno de Vercel.' });
+  }
 
   try {
     var response = await fetch(SUPABASE_URL + '/rest/v1/entries?select=id&limit=1', {

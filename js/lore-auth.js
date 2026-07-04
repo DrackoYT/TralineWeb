@@ -1,7 +1,6 @@
 /* Shared auth module -- Supabase edition */
 var STORAGE_KEY = 'traline_forum_entries';
 var USERS_KEY = 'traline_users';
-var ADMIN_PASSWORD = 'traline2024';
 var GOOGLE_CLIENT_ID = '1061389217388-d9utb39d4hh7heq2crlmff8sl5nojl4p.apps.googleusercontent.com';
 var DISCORD_CLIENT_ID = '1515996446464278590';
 var ALL_PERMS = ['manage_users', 'manage_entries', 'manage_notifications', 'manage_admins', 'manage_comments'];
@@ -31,42 +30,24 @@ async function getUsers() {
   }
 }
 
-function hashPassword(pwd) {
-  var h = 0;
-  for (var i = 0; i < pwd.length; i++) { h = ((h << 5) - h) + pwd.charCodeAt(i); h |= 0; }
-  return h;
-}
-
 async function registerUser(username, password, email, notifications) {
-  var sb = getSupabase();
-  var { data: existing } = await sb.from('users').select('username').eq('username', username).maybeSingle();
-  if (existing) return 'username';
-  if (email) {
-    var { data: emailMatch } = await sb.from('users').select('email').eq('email', email).maybeSingle();
-    if (emailMatch) return 'email';
+  try {
+    var resp = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, email, notifications })
+    });
+    if (resp.status === 409) {
+      var err = await resp.json();
+      return err.error;
+    }
+    if (!resp.ok) return false;
+    var data = await resp.json();
+    return data.user;
+  } catch (e) {
+    console.error('registerUser error:', e);
+    return false;
   }
-  var { error } = await sb.from('users').insert({
-    username: username,
-    password_hash: hashPassword(password),
-    email: email || '',
-    notifications: notifications === true,
-    bio: '',
-    google_id: '',
-    discord_id: '',
-    icon: username.charAt(0).toUpperCase(),
-    picture: '',
-    role: 'user',
-    permissions: []
-  });
-  if (error) { console.error('registerUser error:', error); return false; }
-  return true;
-}
-
-async function authenticateUser(username, password) {
-  var sb = getSupabase();
-  var hash = hashPassword(password);
-  var { data } = await sb.from('users').select('*').eq('username', username).eq('password_hash', hash).maybeSingle();
-  return data || null;
 }
 
 async function getUserProfile(username) {
@@ -136,38 +117,25 @@ function saveSession(user, isAdmin, permissions) {
 function clearSession() { localStorage.removeItem('traline_admin'); currentUser = null; }
 
 async function login(password, username) {
-  var sb = getSupabase();
-  var isAdminPwd = hashPassword(password) === hashPassword(ADMIN_PASSWORD);
-  var user = await authenticateUser(username, password);
-  if (user) {
-    currentUser = username;
-    var perms = (user.role === 'admin' && user.permissions) ? user.permissions : [];
-    saveSession(currentUser, user.role === 'admin', perms);
-    return true;
-  }
-  if (!isAdminPwd) return false;
-  currentUser = username || 'Admin';
-  var { data: existing } = await sb.from('users').select('*').eq('username', currentUser).maybeSingle();
-  if (existing) {
-    await sb.from('users').update({ role: 'admin', permissions: ALL_PERMS }).eq('username', currentUser);
-  } else {
-    await sb.from('users').insert({
-      username: currentUser,
-      password_hash: '',
-      email: '',
-      notifications: true,
-      bio: '',
-      google_id: '',
-      discord_id: '',
-      icon: currentUser.charAt(0).toUpperCase(),
-      picture: '',
-      created_at: new Date().toISOString(),
-      role: 'admin',
-      permissions: ALL_PERMS
+  try {
+    var resp = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
     });
+    if (!resp.ok) return false;
+    var data = await resp.json();
+    if (data.success && data.user) {
+      currentUser = data.user.username;
+      var perms = data.user.permissions || [];
+      saveSession(currentUser, data.user.role === 'admin', perms);
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('login error:', e);
+    return false;
   }
-  saveSession(currentUser, true, ALL_PERMS);
-  return true;
 }
 
 function logout() { clearSession(); renderAdminUI(); closeModal('login-modal'); }
@@ -469,55 +437,6 @@ function renderAdminUI() {
 }
 
 document.addEventListener('DOMContentLoaded', function initAuth() {
-  var sb = getSupabase();
-
-  // Reset users if ?reset param
-  var resetParam = new URLSearchParams(window.location.search).get('reset');
-  if (resetParam === '1') {
-    (async function () {
-      await sb.from('users').delete().neq('id', 0);
-      await sb.from('entries').delete().neq('id', 0);
-      await sb.from('users').insert({
-        username: 'Kael Tharion',
-        password_hash: hashPassword(ADMIN_PASSWORD),
-        email: '',
-        notifications: true,
-        bio: '',
-        google_id: '',
-        discord_id: '',
-        icon: 'K',
-        picture: '',
-        role: 'admin',
-        permissions: ALL_PERMS
-      });
-      console.log('Database reset complete');
-    })();
-  }
-
-  // Ensure Kael Tharion exists with admin perms
-  (async function () {
-    var { data: kael } = await sb.from('users').select('*').eq('username', 'Kael Tharion').maybeSingle();
-    if (kael) {
-      if (kael.role !== 'admin') {
-        await sb.from('users').update({ role: 'admin', permissions: ALL_PERMS }).eq('username', 'Kael Tharion');
-      }
-    } else {
-      await sb.from('users').insert({
-        username: 'Kael Tharion',
-        password_hash: hashPassword(ADMIN_PASSWORD),
-        email: '',
-        notifications: true,
-        bio: '',
-        google_id: '',
-        discord_id: '',
-        icon: 'K',
-        picture: '',
-        role: 'admin',
-        permissions: ALL_PERMS
-      });
-    }
-  })();
-
   // Check for Discord OAuth result
   try {
     var discordResult = sessionStorage.getItem('discord_auth_result');
@@ -667,7 +586,7 @@ document.addEventListener('DOMContentLoaded', function initAuth() {
     var regResult = await registerUser(username, password, email, notifications);
     if (regResult === 'username') { errorEl.textContent = 'El nombre de usuario ya est\u00e1 en uso.'; errorEl.style.display = 'block'; return; }
     if (regResult === 'email') { errorEl.textContent = 'El correo electr\u00f3nico ya est\u00e1 registrado.'; errorEl.style.display = 'block'; return; }
-    if (regResult !== true) { errorEl.textContent = 'Error al crear la cuenta.'; errorEl.style.display = 'block'; return; }
+    if (!regResult) { errorEl.textContent = 'Error al crear la cuenta.'; errorEl.style.display = 'block'; return; }
     var ok = await login(password, username);
     if (ok) {
       renderAdminUI(); if (typeof renderForum === 'function') renderForum(); closeModal('register-modal');
